@@ -20,6 +20,20 @@ dependencies:
   flutter:
     sdk: flutter
 
+  sprintf: "^4.0.0"
+  cloud_firestore: ^0.9.7
+  intl: 0.15.7
+  url_launcher:
+
+  # These may be used later for login services,
+  # so they are going to stick around for now.
+  #bloc: ^0.8.0
+  #flutter_bloc: ^0.5.0
+  #meta: ^1.1.6
+  #equatable: ^0.1.6
+  shared_preferences: ^0.5.1+2
+  flutter_secure_storage: ^3.2.1+1
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
@@ -44,6 +58,10 @@ flutter:
   # assets:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
+  assets:
+  #TODO: Get better RUF photos to use
+    - assets/images/ruf_photo.jpg
+    - assets/images/ruf_logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
