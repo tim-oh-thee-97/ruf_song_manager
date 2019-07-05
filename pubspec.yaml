@@ -62,6 +62,7 @@ flutter:
   #TODO: Get better RUF photos to use
     - assets/images/ruf_photo.jpg
     - assets/images/ruf_logo.png
+    - assets/images/quad.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

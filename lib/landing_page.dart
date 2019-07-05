@@ -1,6 +1,17 @@
+//Package imports
 import "package:flutter/material.dart";
 
+//File imports
+import 'settings_page.dart';
+import 'song_list.dart';
+import 'view_setlists.dart';
+import 'generate_setlist.dart';
+
 class LandingPage extends StatefulWidget{
+  LandingPage({Key key, this.admin}) : super(key: key);
+
+  final bool admin;
+
   @override
   _LandingPageState createState() => _LandingPageState();
 }
@@ -8,7 +19,6 @@ class LandingPage extends StatefulWidget{
 class _LandingPageState extends State<LandingPage>{
   final String title = "RUF Song Manager";
   final String _adminKey = "admin_mode";
-  bool _admin = true;
   final double _pad = 12;
 
   @override
@@ -23,7 +33,7 @@ class _LandingPageState extends State<LandingPage>{
         leading: IconButton(
           icon: Icon(Icons.help),
           iconSize: 32,
-          //TODO: Implement onPressed
+          //TODO: Implement open help
           onPressed: null,
         ),
         title: Center(child: Text(title, textScaleFactor: 1.1,),),
@@ -31,8 +41,7 @@ class _LandingPageState extends State<LandingPage>{
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            //TODO: Implement onPressed
-            onPressed: null,
+            onPressed: () => _navToPage(Settings(admin: widget.admin,)),
           ),
         ],
       ),
@@ -73,7 +82,7 @@ class _LandingPageState extends State<LandingPage>{
                 RaisedButton(
                   padding: EdgeInsets.all(_pad),
                   child: buttonText("View Song List"),
-                  //TODO: Implement onPressed
+                  //TODO: Implement navigate to song list
                   onPressed: null,
                 ),
 
@@ -82,8 +91,7 @@ class _LandingPageState extends State<LandingPage>{
                 RaisedButton(
                   padding: EdgeInsets.all(_pad),
                   child: buttonText("View Past Setlists"),
-                  //TODO: Implement onPressed
-                  onPressed: null,
+                  onPressed: () => _navToPage(ViewSetlists(admin: widget.admin,)),
                 ),
 
                 SizedBox(height: 2*_pad,),
@@ -92,7 +100,7 @@ class _LandingPageState extends State<LandingPage>{
                   padding: EdgeInsets.all(_pad),
                   //TODO: Add Spotify logo next to text
                   child: buttonText("Open Spotify Playlist"),
-                  //TODO: Implement onPressed
+                  //TODO: Implement open Spotify
                   onPressed: null,
                 ),
 
@@ -102,7 +110,7 @@ class _LandingPageState extends State<LandingPage>{
           ),
         ),
       ),
-      floatingActionButton: _admin? FloatingActionButton.extended(
+      floatingActionButton: widget.admin? FloatingActionButton.extended(
         icon: Icon(Icons.music_note),
         label: Text("Generate New Setlist",
           textScaleFactor: 1.7,
@@ -115,6 +123,12 @@ class _LandingPageState extends State<LandingPage>{
         onPressed: null,
       ) : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  void _navToPage(Widget widget) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => widget)
     );
   }
 }
