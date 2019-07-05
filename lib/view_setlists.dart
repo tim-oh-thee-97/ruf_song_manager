@@ -118,7 +118,7 @@ class _ViewSetlistsState extends State<ViewSetlists>{
   }
 
   List<Widget> _populateOneSetlist(DocumentSnapshot ds){
-    List<Widget> songs = List<Widget>(ds.data.length);
+    List<Widget> songs = List<Widget>();
     for(int i = 1; i <= ds.data.length; i++){
       String lookup = 'song' + i.toString();
       songs.add(
