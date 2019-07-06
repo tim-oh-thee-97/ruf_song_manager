@@ -29,7 +29,6 @@ class _SongListState extends State<SongList>{
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            //TODO: Change this admin to the variable
             onPressed: () => _navToPage(Settings(admin: widget.admin,)),
           ),
         ],
@@ -63,16 +62,24 @@ class _SongListState extends State<SongList>{
 
             return ListView.builder(
               itemBuilder: (context, index) =>
-                  _buildSetlistList(docList, context, index),
+                  _buildSongList(docList, context, index),
               itemCount: docList.length,
             );
           },
         ),
       ),
+
+      floatingActionButton: widget.admin ? FloatingActionButton(
+        child: Icon(Icons.add),
+        heroTag: null,
+        tooltip: "New Song",
+        //TODO: implement add (open add song dialog)
+        onPressed: null,
+      ) : null,
     );
   }
 
-  Widget _buildSetlistList(List<DocumentSnapshot> list,
+  Widget _buildSongList(List<DocumentSnapshot> list,
       BuildContext context, int index) {
     DocumentSnapshot ds = list[index];
     String appendMaj = ds['major'] ? "major" : "minor";
@@ -82,7 +89,8 @@ class _SongListState extends State<SongList>{
       subtitle: Text(ds['key'] + " " + appendMaj),
         trailing: widget.admin ? IconButton(
           icon: Icon(Icons.edit),
-          //TODO: implement edit song (takes you to song list with "add" button)
+          tooltip: "Edit",
+          //TODO: implement edit song (opens edit song dialog)
           onPressed: null,
         ) : null,
       //TODO: implement Snackbar on tap

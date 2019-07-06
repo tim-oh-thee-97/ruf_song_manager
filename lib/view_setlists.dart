@@ -30,7 +30,6 @@ class _ViewSetlistsState extends State<ViewSetlists>{
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            //TODO: Change this admin to the variable
             onPressed: () => _navToPage(Settings(admin: widget.admin,)),
           ),
         ],
@@ -125,6 +124,7 @@ class _ViewSetlistsState extends State<ViewSetlists>{
             title: _createRichText("Song " + i.toString() + ": ", ds[lookup]),
             trailing: widget.admin ? IconButton(
               icon: Icon(Icons.edit),
+              tooltip: "Edit",
               //TODO: implement edit song (takes you to song list with "add" button)
               onPressed: null,
             ) : null,

@@ -1,11 +1,12 @@
 class Song{
-  String key;
+  String title, key;
   bool major, begin, mid, end;
 
-  Song(this.key, this.major, this.begin, this.mid, this.end);
+  Song(this.title, this.key, this.major, this.begin, this.mid, this.end);
 
   toJson(){
     return{
+      "title": null,
       "key": key,
       "major": major,
       "begin": begin,
