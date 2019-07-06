@@ -1,5 +1,7 @@
 //Package imports
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //File imports
 import 'settings_page.dart';
@@ -8,22 +10,61 @@ import 'view_setlists.dart';
 import 'generate_setlist.dart';
 
 class LandingPage extends StatefulWidget{
-  LandingPage({Key key, this.admin}) : super(key: key);
-
-  final bool admin;
+  LandingPage({Key key}) : super(key: key);
 
   @override
   _LandingPageState createState() => _LandingPageState();
 }
 
 class _LandingPageState extends State<LandingPage>{
+  final String _setlistLengthKey = 'setlist_length';
+  final String _wksBeforeReuseKey = 'wks_before_reuse';
+  final String _spotifyURLKey = 'spotify_url';
+  final String _adminKey = 'are_you_admin';
+
+  int _setlistLength;
+  final int _defaultSetlistLength = 4;
+  final int _defaultWksBeforeReuse = 4;
+  final String _defaultSpotifyURL = "https://open.spotify.com/playlist/6oV0zvl4hQ0Sy7EJrqWpjp";
+  bool _appAdminMode = false;
+
   final String title = "RUF Song Manager";
-  final String _adminKey = "admin_mode";
   final double _pad = 12;
 
   @override
   void initState(){
     super.initState();
+    _getMode().then((result){
+      setState((){
+        _appAdminMode = result;
+      });
+    });
+    _setDefaultsIfNull().then((result){
+      if(result != null)
+        _setlistLength = result;
+      else
+        _setlistLength = _defaultSetlistLength;
+    });
+  }
+
+  Future<int> _setDefaultsIfNull() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.getInt(_setlistLengthKey) == null)
+      prefs.setInt(_setlistLengthKey, _defaultSetlistLength);
+    if(prefs.getInt(_wksBeforeReuseKey) == null)
+      prefs.setInt(_wksBeforeReuseKey, _defaultWksBeforeReuse);
+    if(prefs.getString(_spotifyURLKey) == null)
+      prefs.setString(_spotifyURLKey, _defaultSpotifyURL);
+    return prefs.getInt(_setlistLengthKey);
+  }
+
+  Future<bool> _getMode() async{
+    final FlutterSecureStorage storage = FlutterSecureStorage();
+    String _admin = await storage.read(key: _adminKey) ?? "false";
+    if(_admin == "true")
+      return true;
+    else
+      return false;
   }
 
   @override
@@ -41,7 +82,7 @@ class _LandingPageState extends State<LandingPage>{
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => _navToPage(Settings(admin: widget.admin,)),
+            onPressed: () => _navToPage(Settings(admin: _appAdminMode,)),
           ),
         ],
       ),
@@ -77,12 +118,15 @@ class _LandingPageState extends State<LandingPage>{
                   child: Text("Welcome", textScaleFactor: 2.75,),
                 ),
 
+                //TODO: Remove this
+                Text(_appAdminMode.toString()),
+
                 SizedBox(height: 2.05*_pad,),
 
                 RaisedButton(
                   padding: EdgeInsets.all(_pad),
                   child: buttonText("View Song List"),
-                  onPressed: () => _navToPage(SongList(admin: widget.admin,)),
+                  onPressed: () => _navToPage(SongList(admin: _appAdminMode,)),
                 ),
 
                 SizedBox(height: 2*_pad,),
@@ -90,7 +134,7 @@ class _LandingPageState extends State<LandingPage>{
                 RaisedButton(
                   padding: EdgeInsets.all(_pad),
                   child: buttonText("View Past Setlists"),
-                  onPressed: () => _navToPage(ViewSetlists(admin: widget.admin,)),
+                  onPressed: () => _navToPage(ViewSetlists(admin: _appAdminMode,)),
                 ),
 
                 SizedBox(height: 2*_pad,),
@@ -103,13 +147,29 @@ class _LandingPageState extends State<LandingPage>{
                   onPressed: null,
                 ),
 
+                SizedBox(height: 2*_pad,),
+
+                //TODO: Remove this
+                RaisedButton(
+                  padding: EdgeInsets.all(_pad),
+                  child: buttonText("Toggle Admin (DEBUG ONLY)"),
+                  onPressed: () async{
+                    final FlutterSecureStorage storage = FlutterSecureStorage();
+                    if(_appAdminMode)
+                      await storage.write(key: _adminKey, value: "false");
+                    else
+                      await storage.write(key: _adminKey, value: "true");
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => widget));
+                  },
+                ),
+
                 SizedBox(height: 4*_pad,),
               ],
             ),
           ),
         ),
       ),
-      floatingActionButton: widget.admin? FloatingActionButton.extended(
+      floatingActionButton: _appAdminMode ? FloatingActionButton.extended(
         icon: Icon(Icons.music_note),
         label: Text("Generate New Setlist",
           textScaleFactor: 1.7,
@@ -119,8 +179,7 @@ class _LandingPageState extends State<LandingPage>{
         ),
         heroTag: null,
         tooltip: "New Setlist",
-        //TODO: implement onPressed: nav to generate setlist
-        onPressed: null,
+        onPressed: () => _navToPage(GenerateSetlist(admin: _appAdminMode, setlistLength: _setlistLength,)),
       ) : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );

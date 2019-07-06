@@ -1,6 +1,7 @@
 //Package imports
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:core';
 
 //File imports
 import 'song.dart';
@@ -111,8 +112,53 @@ class _ViewSetlistsState extends State<ViewSetlists>{
   }
 
   String _createDateOfSetlist(String unformatted){
-    //TODO: Implement this function
-    return "January 1, 1970";
+    int month = int.tryParse(unformatted.substring(0,2));
+    String day = unformatted.substring(2,4);
+    String year = unformatted.substring(4);
+    String fullDate = "";
+    switch(month){
+      case 1:
+        fullDate += "January";
+        break;
+      case 2:
+        fullDate += "February";
+        break;
+      case 3:
+        fullDate += "March";
+        break;
+      case 4:
+        fullDate += "April";
+        break;
+      case 5:
+        fullDate += "May";
+        break;
+      case 6:
+        fullDate += "June";
+        break;
+      case 7:
+        fullDate += "July";
+        break;
+      case 8:
+        fullDate += "August";
+        break;
+      case 9:
+        fullDate += "September";
+        break;
+      case 10:
+        fullDate += "October";
+        break;
+      case 11:
+        fullDate += "November";
+        break;
+      case 12:
+        fullDate += "December";
+        break;
+      default:
+        fullDate += "ERROR";
+        break;
+    }
+    fullDate += " " + day + ", " + year;
+    return fullDate;
   }
 
   List<Widget> _populateOneSetlist(DocumentSnapshot ds){

@@ -1,4 +1,6 @@
+//Package Imports
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget{
   Settings({Key key, this.admin}) : super(key: key);
@@ -14,24 +16,27 @@ class Settings extends StatefulWidget{
 final String pageTitle = "Settings";
 
 class _SettingsState extends State<Settings>{
-  final int _defaultSongsPerSetlist = 4;
-  final int _defaultWksBeforeReuse = 4;
-  //TODO: Get Spotify URL
-  final String _defaultSpotifyURL = "TODO";
 
-  int _songsPerSetlist, _wksBeforeReuse;
+  int _setlistLength, _wksBeforeReuse;
   String _spotifyURL;
   String _errorText;
+
+  final String _setlistLengthKey = 'setlist_length';
+  final String _wksBeforeReuseKey = 'wks_before_reuse';
+  final String _spotifyURLKey = 'spotify_url';
+  final int _defaultSetlistLength = 4;
+  final int _defaultWksBeforeReuse = 4;
+  final String _defaultSpotifyURL = "https://open.spotify.com/playlist/6oV0zvl4hQ0Sy7EJrqWpjp";
 
   final double _pad = 10.0;
 
   TextEditingController
-    _songsPerSetlistInput, _wksBeforeReuseInput, _spotifyURLInput;
+    _setlistLengthInput, _wksBeforeReuseInput, _spotifyURLInput;
 
   @override
   void dispose(){
     super.dispose();
-    _songsPerSetlistInput.dispose();
+    _setlistLengthInput.dispose();
     _wksBeforeReuseInput.dispose();
     _spotifyURLInput.dispose();
   }
@@ -39,15 +44,34 @@ class _SettingsState extends State<Settings>{
   @override
   void initState(){
     super.initState();
-    //TODO: Read settings from shared_preferences and populate fields
-    //Set to default if not found
-    _songsPerSetlist = _defaultSongsPerSetlist;
-    _wksBeforeReuse = _defaultWksBeforeReuse;
-    _spotifyURL = _defaultSpotifyURL;
-    _songsPerSetlistInput = TextEditingController(text: _songsPerSetlist.toString());
-    _wksBeforeReuseInput = TextEditingController(text: _wksBeforeReuse.toString());
-    _spotifyURLInput = TextEditingController(text: _spotifyURL);
+    //Settings should be saved on app startup
+    // (if user does not already have them saved)
+    _readSettings().then((returned){
+      if(returned == 1)
+        setState((){
+          _setlistLengthInput = TextEditingController(text: _setlistLength.toString());
+          _wksBeforeReuseInput = TextEditingController(text: _wksBeforeReuse.toString());
+          _spotifyURLInput = TextEditingController(text: _spotifyURL);
+
+        });
+      else
+        setState((){
+          _setlistLengthInput = TextEditingController(text: _defaultSetlistLength.toString());
+          _wksBeforeReuseInput = TextEditingController(text: _defaultWksBeforeReuse.toString());
+          _spotifyURLInput = TextEditingController(text: _defaultSpotifyURL);
+        });
+    });
     _errorText = null;
+  }
+
+  Future<int> _readSettings() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState((){
+      _setlistLength = prefs.getInt(_setlistLengthKey) ?? _defaultSetlistLength;
+      _wksBeforeReuse = prefs.getInt(_wksBeforeReuseKey) ?? _defaultWksBeforeReuse;
+      _spotifyURL = prefs.getString(_spotifyURLKey) ?? _defaultSpotifyURL;
+    });
+    return 1;
   }
 
   @override
@@ -74,7 +98,7 @@ class _SettingsState extends State<Settings>{
 
           Expanded(
             child: TextField(
-              controller: _songsPerSetlistInput,
+              controller: _setlistLengthInput,
               onEditingComplete: (){
                 FocusScope.of(context).requestFocus(FocusNode());
                 //TODO: Validate fields
@@ -162,6 +186,7 @@ class _SettingsState extends State<Settings>{
       SizedBox(height: _pad,),
 
       //TODO: Checkbox for middle songs same key
+      //TODO: Logout of admin
     ];
 
     // TODO: finish build

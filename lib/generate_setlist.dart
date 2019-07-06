@@ -8,9 +8,10 @@ import 'song.dart';
 import 'settings_page.dart';
 
 class GenerateSetlist extends StatefulWidget{
-  GenerateSetlist({Key key, this.admin}) : super(key: key);
+  GenerateSetlist({Key key, this.admin, this.setlistLength}) : super(key: key);
 
   final bool admin;
+  final int setlistLength;
 
   @override
   _GenerateSetlistState createState() => _GenerateSetlistState();
@@ -20,7 +21,8 @@ final String pageTitle = "Generate Setlist";
 
 class _GenerateSetlistState extends State<GenerateSetlist>{
   final mainReference = Firestore.instance.collection('song-list');
-  List<Song> songList;
+  List<Song> songList = List<Song>();
+  bool _songListPopulated = false;
 
   final int _defaultSetlistLength = 4;
   int _setlistLength;
@@ -30,7 +32,28 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
     super.initState();
     //TODO: Read settings for setlist length
     _setlistLength = _defaultSetlistLength;
-    //TODO: Populate song list
+    _getSongList().then((done){
+      setState((){
+        _songListPopulated = true;
+      });
+    });
+  }
+
+  Future<bool> _getSongList() async{
+    await mainReference.getDocuments().then((contentsOfSongList){
+      for(int i = 0; i < contentsOfSongList.documents.length; i++){
+        DocumentSnapshot song = contentsOfSongList.documents[i];
+        songList.add(new Song(
+            song.documentID,
+            song['key'],
+            song['major'],
+            song['begin'],
+            song['mid'],
+            song['end']
+        ));
+      }
+    });
+    return true;
   }
 
   @override
@@ -62,13 +85,12 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
           ),
         ),
 
-        child: ListView.separated(
+        child: _songListPopulated ? ListView.builder(
             itemBuilder: (context, index){
-              _displaySetlist(_buildSetlist(songList), index);
+              _displaySetlist(_buildSetlist(songList), context, index);
             },
-            separatorBuilder: (context, index){return Divider();},
             itemCount: _setlistLength,
-        ),
+        ) : CircularProgressIndicator(),
       ),
 
       floatingActionButton: widget.admin? FloatingActionButton.extended(
@@ -88,7 +110,9 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
     );
   }
 
-  ListTile _displaySetlist(List<Song> songsInSetlist, int index){
+  ListTile _displaySetlist(List<Song> songsInSetlist,
+      BuildContext context, int index){
+    //TODO: This isn't displaying for some reason
     Song s = songsInSetlist[index];
 
     return ListTile(
@@ -106,6 +130,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
 
   List<Song> _buildSetlist(List<Song> allSongs) {
     //TODO: Finish this function
+    //TODO: Prevent the setlist from populating multiple times when you open settings
     List<Song> setlist = List<Song>();
     //Create random generator
     Random gen = Random.secure();
@@ -127,6 +152,8 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
         int rand = gen.nextInt(allSongs.length);
         Song tryThis = allSongs[rand];
         if (tryThis.mid && !setlist.contains(tryThis)){
+          setlist.add(tryThis);
+          break;
           //TODO: Find a way to check the key and/or if the user wants the mids to be the same key
         }
       }
@@ -138,6 +165,9 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
         setlist.add(tryThis);
         break;
       }
+    }
+    for(int i = 0; i < setlist.length; i++){
+      print(setlist[i].title);
     }
     return setlist;
   }
