@@ -82,8 +82,7 @@ class _LandingPageState extends State<LandingPage>{
                 RaisedButton(
                   padding: EdgeInsets.all(_pad),
                   child: buttonText("View Song List"),
-                  //TODO: Implement navigate to song list
-                  onPressed: null,
+                  onPressed: () => _navToPage(SongList(admin: widget.admin,)),
                 ),
 
                 SizedBox(height: 2*_pad,),

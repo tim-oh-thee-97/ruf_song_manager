@@ -25,7 +25,7 @@ class _ViewSetlistsState extends State<ViewSetlists>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(pageTitle),
+        title: Text(pageTitle, textScaleFactor: 1.1,),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
@@ -56,9 +56,8 @@ class _ViewSetlistsState extends State<ViewSetlists>{
             if (!snapshot.hasData)
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CircularProgressIndicator()
-                ],
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[LinearProgressIndicator()],
               );
 
             List<DocumentSnapshot> docList = snapshot.data.documents;

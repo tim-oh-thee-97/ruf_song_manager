@@ -21,12 +21,12 @@ class _SettingsState extends State<Settings>{
 
   int _songsPerSetlist, _wksBeforeReuse;
   String _spotifyURL;
+  String _errorText;
 
   final double _pad = 10.0;
 
-  TextEditingController _songsPerSetlistInput = TextEditingController();
-  TextEditingController _wksBeforeReuseInput = TextEditingController();
-  TextEditingController _spotifyURLInput = TextEditingController();
+  TextEditingController
+    _songsPerSetlistInput, _wksBeforeReuseInput, _spotifyURLInput;
 
   @override
   void dispose(){
@@ -41,27 +41,132 @@ class _SettingsState extends State<Settings>{
     super.initState();
     //TODO: Read settings from shared_preferences and populate fields
     //Set to default if not found
+    _songsPerSetlist = _defaultSongsPerSetlist;
+    _wksBeforeReuse = _defaultWksBeforeReuse;
+    _spotifyURL = _defaultSpotifyURL;
+    _songsPerSetlistInput = TextEditingController(text: _songsPerSetlist.toString());
+    _wksBeforeReuseInput = TextEditingController(text: _wksBeforeReuse.toString());
+    _spotifyURLInput = TextEditingController(text: _spotifyURL);
+    _errorText = null;
   }
 
   @override
   Widget build(BuildContext context) {
 
     final settingsWidgets = <Widget>[
-      //TODO: Populate this list
-      Text("Test"),
+      //TODO: Improve this formatting a lot
+      Text(_errorText == null ? "" : _errorText,
+        textScaleFactor: 1.4,
+        style: TextStyle(
+          color: Colors.red,
+        ),
+      ),
+
       SizedBox(height: _pad),
-      Text("Test 2"),
+
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        //crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text("Songs per setlist", textScaleFactor: 2,),
+
+          Spacer(flex: 2,),
+
+          Expanded(
+            child: TextField(
+              controller: _songsPerSetlistInput,
+              onEditingComplete: (){
+                FocusScope.of(context).requestFocus(FocusNode());
+                //TODO: Validate fields
+              },
+              keyboardType: TextInputType.number,
+              maxLength: 2,
+              maxLengthEnforced: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue[700]),
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                ),
+                counterText: "",
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+
       SizedBox(height: _pad),
-      Text("Test 3"),
+
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        //crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text("Minimum weeks before reusing a song"),
+
+          Spacer(flex: 2,),
+
+          Expanded(
+            child: TextField(
+              controller: _wksBeforeReuseInput,
+              onEditingComplete: (){
+                FocusScope.of(context).requestFocus(FocusNode());
+                //TODO: Validate fields
+              },
+              keyboardType: TextInputType.number,
+              maxLength: 2,
+              maxLengthEnforced: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue[700]),
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                ),
+                counterText: "",
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+
       SizedBox(height: _pad),
-      //Input
-      //Error message (or null)
-      //...
+
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        //crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text("Spotify URL"),
+
+          Spacer(flex: 1,),
+
+          Expanded(
+            child: TextField(
+              controller: _spotifyURLInput,
+              onEditingComplete: (){
+                FocusScope.of(context).requestFocus(FocusNode());
+                //TODO: Validate fields
+              },
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue[700]),
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                ),
+                counterText: "",
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ],
+      ),
+
+      SizedBox(height: _pad,),
+
+      //TODO: Checkbox for middle songs same key
     ];
 
     // TODO: finish build
     return Scaffold(
-      appBar: AppBar(title: Text(pageTitle),),
+      appBar: AppBar(title: Text(pageTitle, textScaleFactor: 1.1,),),
       //TODO: Check changes if user presses back button, "Do you want to save changes?"
       body: GestureDetector(
         onTap: (){
