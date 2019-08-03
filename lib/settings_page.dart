@@ -1,13 +1,13 @@
 //Package Imports
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+//File Imports
+import 'landing_page.dart';
 
 class Settings extends StatefulWidget{
-  Settings({Key key, this.admin}) : super(key: key);
-
-  //Only allow editing if admin is true!
-  //On second thought, maybe allow editing anyway since it doesn't matter
-  final bool admin;
+  Settings({Key key}) : super(key: key);
 
   @override
   _SettingsState createState() => _SettingsState();
@@ -77,6 +77,8 @@ class _SettingsState extends State<Settings>{
   @override
   Widget build(BuildContext context) {
 
+    final String _adminKey = 'are_you_admin';
+
     final settingsWidgets = <Widget>[
       //TODO: Improve this formatting a lot
       Text(_errorText == null ? "" : _errorText,
@@ -87,6 +89,14 @@ class _SettingsState extends State<Settings>{
       ),
 
       SizedBox(height: _pad),
+
+      ListTile(
+        contentPadding: EdgeInsets.all(_pad),
+        title: Text("Songs Per Setlist"),
+        subtitle: Text(_setlistLength.toString()),
+        //TODO: Implement onTap
+        onTap: null,
+      ),
 
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -186,7 +196,20 @@ class _SettingsState extends State<Settings>{
       SizedBox(height: _pad,),
 
       //TODO: Checkbox for middle songs same key
-      //TODO: Logout of admin
+      //TODO: Logout button
+
+      RaisedButton(
+        padding: EdgeInsets.all(_pad),
+        color: Colors.red,
+        child: Text("Logout"),
+        onPressed: () async {
+          final FlutterSecureStorage storage = FlutterSecureStorage();
+          await storage.write(key: _adminKey, value: "false");
+          Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
+          Navigator.pop(context);
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingPage()));
+        },
+      ),
     ];
 
     // TODO: finish build

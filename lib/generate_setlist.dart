@@ -5,6 +5,7 @@ import 'dart:math';
 
 //File imports
 import 'song.dart';
+import 'song_list.dart';
 import 'settings_page.dart';
 
 class GenerateSetlist extends StatefulWidget{
@@ -65,12 +66,13 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => _navToPage(Settings(admin: widget.admin,)),
+            onPressed: () => _navToPage(Settings()),
           ),
         ],
       ),
 
       body: Container(
+        alignment: Alignment(0,0),
         decoration: BoxDecoration(
           image: DecorationImage(
             //TODO: Change this background image?
@@ -87,10 +89,14 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
 
         child: _songListPopulated ? ListView.builder(
             itemBuilder: (context, index){
-              _displaySetlist(_buildSetlist(songList), context, index);
+              return _displaySetlist(_buildSetlist(songList), context, index);
             },
             itemCount: _setlistLength,
-        ) : CircularProgressIndicator(),
+        ) : SizedBox(
+          child: CircularProgressIndicator(),
+          height: 150,
+          width: 150,
+        ),
       ),
 
       floatingActionButton: widget.admin? FloatingActionButton.extended(
@@ -116,21 +122,28 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
     Song s = songsInSetlist[index];
 
     return ListTile(
-      leading: CircleAvatar(child: Text(index.toString())),
+      leading: CircleAvatar(child: Text((index+1).toString())),
       title: Text(s.title),
       subtitle: Text(s.key + " " + (s.major ? "major" : "minor")),
       trailing: IconButton(
         icon: Icon(Icons.edit),
         tooltip: "Edit",
-        //TODO: implement edit song (takes you to song list with "add" button if admin)
-        onPressed: null,
+        onPressed: () async {
+          Song s = await _navToPageWithResult(SongList(admin: widget.admin, select: true));
+          if(s != null){
+            print(s.toString());
+            setState((){
+              songsInSetlist[index] = s;
+            });
+          }
+        },
       ),
     );
   }
 
   List<Song> _buildSetlist(List<Song> allSongs) {
     //TODO: Finish this function
-    //TODO: Prevent the setlist from populating multiple times when you open settings
+    //TODO: Prevent the setlist from populating multiple times e.g. when you open settings
     List<Song> setlist = List<Song>();
     //Create random generator
     Random gen = Random.secure();
@@ -153,6 +166,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
         Song tryThis = allSongs[rand];
         if (tryThis.mid && !setlist.contains(tryThis)){
           setlist.add(tryThis);
+          numMid++;
           break;
           //TODO: Find a way to check the key and/or if the user wants the mids to be the same key
         }
@@ -167,14 +181,21 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
       }
     }
     for(int i = 0; i < setlist.length; i++){
-      print(setlist[i].title);
+      print(setlist[i].toString());
     }
     return setlist;
   }
 
   void _navToPage(Widget widget) {
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => widget)
+        MaterialPageRoute(builder: (context) => widget, maintainState: true)
     );
+  }
+
+  Future<Song> _navToPageWithResult(Widget widget) async {
+    final Song toReturn = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => widget, maintainState: true)
+    );
+    return toReturn;
   }
 }

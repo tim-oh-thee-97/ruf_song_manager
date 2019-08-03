@@ -1,15 +1,19 @@
 //Package imports
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 //File imports
+import 'authentication.dart';
+import 'login_page.dart';
 import 'song.dart';
+import 'add_edit_song_page.dart';
 import 'settings_page.dart';
 
 class SongList extends StatefulWidget{
-  SongList({Key key, this.admin}) : super(key: key);
+  SongList({Key key, this.admin, this.select}) : super(key: key);
 
-  final bool admin;
+  final bool admin, select;
 
   @override
   _SongListState createState() => _SongListState();
@@ -19,17 +23,26 @@ final String pageTitle = "Song List";
 
 class _SongListState extends State<SongList>{
   final mainReference = Firestore.instance.collection('song-list');
+  final String _adminKey = 'are_you_admin';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(pageTitle, textScaleFactor: 1.1,),
-        actions: <Widget>[
+        actions: widget.admin ? <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => _navToPage(Settings(admin: widget.admin,)),
+            onPressed: () => _navToPage(Settings()),
+          ),
+        ] : <Widget>[
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            iconSize: 32,
+            onPressed: () =>
+                _navToPage(
+                    LoginSignUpPage(auth: Auth(), onSignedIn: _turnOnAdmin,)),
           ),
         ],
       ),
@@ -73,8 +86,7 @@ class _SongListState extends State<SongList>{
         child: Icon(Icons.add),
         heroTag: null,
         tooltip: "New Song",
-        //TODO: implement add (open add song dialog)
-        onPressed: null,
+        onPressed: () => _navToPage(AddEditSongPage(song: null)),
       ) : null,
     );
   }
@@ -90,11 +102,49 @@ class _SongListState extends State<SongList>{
         trailing: widget.admin ? IconButton(
           icon: Icon(Icons.edit),
           tooltip: "Edit",
-          //TODO: implement edit song (opens edit song dialog)
-          onPressed: null,
+          onPressed: (){
+            Song s = new Song(
+              ds.documentID,
+              ds['key'],
+              ds['major'],
+              ds['begin'],
+              ds['mid'],
+              ds['end']
+            );
+            _navToPage(AddEditSongPage(song: s));
+          },
         ) : null,
-      //TODO: implement Snackbar on tap
-      onTap: null,
+      onTap: (){
+        Song s = new Song(
+            ds.documentID,
+            ds['key'],
+            ds['major'],
+            ds['begin'],
+            ds['mid'],
+            ds['end']
+        );
+        if(!widget.select){
+          String snackText = "Tags: ";
+          if(ds['begin']){
+            snackText += "begin";
+            if(ds['mid'] || ds['end'])
+              snackText += ", ";
+          }
+          if(ds['mid']){
+            snackText += "mid";
+            if(ds['end'])
+              snackText += ", ";
+          }
+          if(ds['end'])
+            snackText += "end";
+          Scaffold.of(context)
+            ..removeCurrentSnackBar()
+            ..showSnackBar(SnackBar(content: Text(snackText),
+                            duration: Duration(seconds: 2),));
+        }
+        else
+          Navigator.pop(context, s);
+      },
     );
   }
 
@@ -103,6 +153,11 @@ class _SongListState extends State<SongList>{
         MaterialPageRoute(builder: (context) => widget)
     );
   }
-}
 
-//TODO: create add dialog, edit dialog
+  void _turnOnAdmin() async{
+    final FlutterSecureStorage storage = FlutterSecureStorage();
+    await storage.write(key: _adminKey, value: "true");
+    Navigator.pop(context);
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SongList(admin: true,)));
+  }
+}

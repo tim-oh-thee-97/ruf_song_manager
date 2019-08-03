@@ -14,4 +14,8 @@ class Song{
       "end": end,
     };
   }
+
+  toString(){
+    return title + ": " + key + " " + (major ? "major" : "minor");
+  }
 }

@@ -1,9 +1,12 @@
 //Package imports
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:core';
 
 //File imports
+import 'authentication.dart';
+import 'login_page.dart';
 import 'song.dart';
 import 'song_list.dart';
 import 'settings_page.dart';
@@ -21,17 +24,26 @@ final String pageTitle = "View Setlists";
 
 class _ViewSetlistsState extends State<ViewSetlists>{
   final mainReference = Firestore.instance.collection('past-setlists');
+  final String _adminKey = 'are_you_admin';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(pageTitle, textScaleFactor: 1.1,),
-        actions: <Widget>[
+        actions: widget.admin ? <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => _navToPage(Settings(admin: widget.admin,)),
+            onPressed: () => _navToPage(Settings()),
+          ),
+        ] : <Widget>[
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            iconSize: 32,
+            onPressed: () =>
+                _navToPage(
+                    LoginSignUpPage(auth: Auth(), onSignedIn: _turnOnAdmin,)),
           ),
         ],
       ),
@@ -172,7 +184,18 @@ class _ViewSetlistsState extends State<ViewSetlists>{
               icon: Icon(Icons.edit),
               tooltip: "Edit",
               //TODO: implement edit song (takes you to song list with "add" button)
-              onPressed: null,
+              onPressed: () async{
+                Song chosen = await _navToPageWithResult(SongList(admin: widget.admin, select: true,));
+                if(chosen != null){
+                  String songToChange = "song" + i.toString();
+                  List<String> songNum = new List<String>();
+                  songNum.add(songToChange);
+                  List<String> newSong = new List<String>();
+                  newSong.add(chosen.title);
+                  mainReference.document(ds.documentID)
+                      .updateData(Map.fromIterables(songNum, newSong));
+                }
+              },
             ) : null,
           ));
     }
@@ -184,5 +207,19 @@ class _ViewSetlistsState extends State<ViewSetlists>{
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => widget)
     );
+  }
+
+  Future<Song> _navToPageWithResult(Widget widget) async {
+    final Song toReturn = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => widget)
+    );
+    return toReturn;
+  }
+
+  void _turnOnAdmin() async{
+    final FlutterSecureStorage storage = FlutterSecureStorage();
+    await storage.write(key: _adminKey, value: "true");
+    Navigator.pop(context);
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ViewSetlists(admin: true,)));
   }
 }

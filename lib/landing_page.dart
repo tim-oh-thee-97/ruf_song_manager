@@ -8,6 +8,8 @@ import 'settings_page.dart';
 import 'song_list.dart';
 import 'view_setlists.dart';
 import 'generate_setlist.dart';
+import 'login_page.dart';
+import 'authentication.dart';
 
 class LandingPage extends StatefulWidget{
   LandingPage({Key key}) : super(key: key);
@@ -17,6 +19,7 @@ class LandingPage extends StatefulWidget{
 }
 
 class _LandingPageState extends State<LandingPage>{
+
   final String _setlistLengthKey = 'setlist_length';
   final String _wksBeforeReuseKey = 'wks_before_reuse';
   final String _spotifyURLKey = 'spotify_url';
@@ -25,7 +28,8 @@ class _LandingPageState extends State<LandingPage>{
   int _setlistLength;
   final int _defaultSetlistLength = 4;
   final int _defaultWksBeforeReuse = 4;
-  final String _defaultSpotifyURL = "https://open.spotify.com/playlist/6oV0zvl4hQ0Sy7EJrqWpjp";
+  final String _defaultSpotifyURL =
+      "https://open.spotify.com/playlist/6oV0zvl4hQ0Sy7EJrqWpjp";
   bool _appAdminMode = false;
 
   final String title = "RUF Song Manager";
@@ -78,11 +82,17 @@ class _LandingPageState extends State<LandingPage>{
           onPressed: null,
         ),
         title: Center(child: Text(title, textScaleFactor: 1.1,),),
-        actions: <Widget>[
+        actions: _appAdminMode ? <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => _navToPage(Settings(admin: _appAdminMode,)),
+            onPressed: () => _navToPage(Settings()),
+          ),
+        ] : <Widget>[
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            iconSize: 32,
+            onPressed: () => _navToPage(LoginSignUpPage(auth: Auth(), onSignedIn: _turnOnAdmin,)),
           ),
         ],
       ),
@@ -126,7 +136,7 @@ class _LandingPageState extends State<LandingPage>{
                 RaisedButton(
                   padding: EdgeInsets.all(_pad),
                   child: buttonText("View Song List"),
-                  onPressed: () => _navToPage(SongList(admin: _appAdminMode,)),
+                  onPressed: () => _navToPage(SongList(admin: _appAdminMode, select: false,)),
                 ),
 
                 SizedBox(height: 2*_pad,),
@@ -189,6 +199,13 @@ class _LandingPageState extends State<LandingPage>{
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => widget)
     );
+  }
+
+  void _turnOnAdmin() async{
+    final FlutterSecureStorage storage = FlutterSecureStorage();
+    await storage.write(key: _adminKey, value: "true");
+    Navigator.pop(context);
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => widget));
   }
 }
 
