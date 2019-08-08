@@ -13,10 +13,9 @@ import 'login_page.dart';
 import 'nav_service.dart';
 
 class GenerateSetlist extends StatefulWidget{
-  GenerateSetlist({Key key, this.admin, this.setlistLength}) : super(key: key);
+  GenerateSetlist({Key key, this.admin}) : super(key: key);
 
   final bool admin;
-  final int setlistLength;
 
   @override
   _GenerateSetlistState createState() => _GenerateSetlistState();
