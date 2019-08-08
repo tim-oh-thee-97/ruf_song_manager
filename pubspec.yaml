@@ -30,6 +30,8 @@ dependencies:
   shared_preferences: ^0.5.1+2
   flutter_secure_storage: ^3.2.1+1
 
+  numberpicker: ^1.0.0
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
@@ -56,9 +58,7 @@ flutter:
   #  - images/a_dot_ham.jpeg
   assets:
   #TODO: Get better RUF photos to use
-    - assets/images/ruf_photo.jpg
-    - assets/images/ruf_logo.png
-    - assets/images/quad.jpg
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

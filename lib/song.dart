@@ -6,7 +6,7 @@ class Song{
 
   toJson(){
     return{
-      "title": null,
+      "title": title,
       "key": key,
       "major": major,
       "begin": begin,

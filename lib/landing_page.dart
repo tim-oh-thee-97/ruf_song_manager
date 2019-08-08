@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 //File imports
 import 'settings_page.dart';
@@ -10,6 +11,7 @@ import 'view_setlists.dart';
 import 'generate_setlist.dart';
 import 'login_page.dart';
 import 'authentication.dart';
+import 'nav_service.dart';
 
 class LandingPage extends StatefulWidget{
   LandingPage({Key key}) : super(key: key);
@@ -23,6 +25,7 @@ class _LandingPageState extends State<LandingPage>{
   final String _setlistLengthKey = 'setlist_length';
   final String _wksBeforeReuseKey = 'wks_before_reuse';
   final String _spotifyURLKey = 'spotify_url';
+  final String _midsSameKeyKey = 'mid_same';
   final String _adminKey = 'are_you_admin';
 
   int _setlistLength;
@@ -30,6 +33,7 @@ class _LandingPageState extends State<LandingPage>{
   final int _defaultWksBeforeReuse = 4;
   final String _defaultSpotifyURL =
       "https://open.spotify.com/playlist/6oV0zvl4hQ0Sy7EJrqWpjp";
+  final bool _defaultMidSameKey = false;
   bool _appAdminMode = false;
 
   final String title = "RUF Song Manager";
@@ -44,14 +48,13 @@ class _LandingPageState extends State<LandingPage>{
       });
     });
     _setDefaultsIfNull().then((result){
-      if(result != null)
+      setState((){
         _setlistLength = result;
-      else
-        _setlistLength = _defaultSetlistLength;
+      });
     });
   }
 
-  Future<int> _setDefaultsIfNull() async{
+  Future<int> _setDefaultsIfNull() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if(prefs.getInt(_setlistLengthKey) == null)
       prefs.setInt(_setlistLengthKey, _defaultSetlistLength);
@@ -59,10 +62,12 @@ class _LandingPageState extends State<LandingPage>{
       prefs.setInt(_wksBeforeReuseKey, _defaultWksBeforeReuse);
     if(prefs.getString(_spotifyURLKey) == null)
       prefs.setString(_spotifyURLKey, _defaultSpotifyURL);
-    return prefs.getInt(_setlistLengthKey);
+    if(prefs.getBool(_midsSameKeyKey) == null)
+      prefs.setBool(_midsSameKeyKey, _defaultMidSameKey);
+    return prefs.getInt(_setlistLengthKey) ?? _defaultSetlistLength;
   }
 
-  Future<bool> _getMode() async{
+  Future<bool> _getMode() async {
     final FlutterSecureStorage storage = FlutterSecureStorage();
     String _admin = await storage.read(key: _adminKey) ?? "false";
     if(_admin == "true")
@@ -86,13 +91,14 @@ class _LandingPageState extends State<LandingPage>{
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => _navToPage(Settings()),
+            onPressed: () => navToPage(context, Settings()),
           ),
         ] : <Widget>[
           IconButton(
             icon: Icon(Icons.exit_to_app),
             iconSize: 32,
-            onPressed: () => _navToPage(LoginSignUpPage(auth: Auth(), onSignedIn: _turnOnAdmin,)),
+            onPressed: () => navToPage(context, LoginSignUpPage(auth: Auth(),
+              onSignedIn: () => turnOnAdmin(context, LandingPage(), pageOnTop: false),)),
           ),
         ],
       ),
@@ -128,15 +134,12 @@ class _LandingPageState extends State<LandingPage>{
                   child: Text("Welcome", textScaleFactor: 2.75,),
                 ),
 
-                //TODO: Remove this
-                Text(_appAdminMode.toString()),
-
                 SizedBox(height: 2.05*_pad,),
 
                 RaisedButton(
                   padding: EdgeInsets.all(_pad),
                   child: buttonText("View Song List"),
-                  onPressed: () => _navToPage(SongList(admin: _appAdminMode, select: false,)),
+                  onPressed: () => navToPage(context, SongList(admin: _appAdminMode, select: false,)),
                 ),
 
                 SizedBox(height: 2*_pad,),
@@ -144,33 +147,17 @@ class _LandingPageState extends State<LandingPage>{
                 RaisedButton(
                   padding: EdgeInsets.all(_pad),
                   child: buttonText("View Past Setlists"),
-                  onPressed: () => _navToPage(ViewSetlists(admin: _appAdminMode,)),
+                  onPressed: () => navToPage(context, ViewSetlists(admin: _appAdminMode,)),
                 ),
 
                 SizedBox(height: 2*_pad,),
 
                 RaisedButton(
                   padding: EdgeInsets.all(_pad),
-                  //TODO: Add Spotify logo next to text
+                  //TODO: Add Spotify logo next to text?
                   child: buttonText("Open Spotify Playlist"),
                   //TODO: Implement open Spotify
-                  onPressed: null,
-                ),
-
-                SizedBox(height: 2*_pad,),
-
-                //TODO: Remove this
-                RaisedButton(
-                  padding: EdgeInsets.all(_pad),
-                  child: buttonText("Toggle Admin (DEBUG ONLY)"),
-                  onPressed: () async{
-                    final FlutterSecureStorage storage = FlutterSecureStorage();
-                    if(_appAdminMode)
-                      await storage.write(key: _adminKey, value: "false");
-                    else
-                      await storage.write(key: _adminKey, value: "true");
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => widget));
-                  },
+                  onPressed: () => _launchSpotifyURL,
                 ),
 
                 SizedBox(height: 4*_pad,),
@@ -179,7 +166,7 @@ class _LandingPageState extends State<LandingPage>{
           ),
         ),
       ),
-      floatingActionButton: _appAdminMode ? FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton.extended(
         icon: Icon(Icons.music_note),
         label: Text("Generate New Setlist",
           textScaleFactor: 1.7,
@@ -189,23 +176,32 @@ class _LandingPageState extends State<LandingPage>{
         ),
         heroTag: null,
         tooltip: "New Setlist",
-        onPressed: () => _navToPage(GenerateSetlist(admin: _appAdminMode, setlistLength: _setlistLength,)),
-      ) : null,
+        onPressed: () => navToPage(context, GenerateSetlist(admin: _appAdminMode, setlistLength: _setlistLength,)),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
-  void _navToPage(Widget widget) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => widget)
-    );
-  }
-
-  void _turnOnAdmin() async{
-    final FlutterSecureStorage storage = FlutterSecureStorage();
-    await storage.write(key: _adminKey, value: "true");
-    Navigator.pop(context);
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => widget));
+  void _launchSpotifyURL() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Read settings and see if the url is null
+    String url = prefs.getString(_spotifyURLKey) ?? "ERROR";
+    if(url == "ERROR"){
+      Scaffold.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text("Could not launch url. Please check settings."),
+          duration: Duration(seconds: 5),));
+    }
+    else if (await canLaunch(url)) {
+      await launch(url);
+    }
+    else {
+      Scaffold.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text("Could not launch url. Please check settings."),
+          duration: Duration(seconds: 5),));
+      throw 'Could not launch $url';
+    }
   }
 }
 

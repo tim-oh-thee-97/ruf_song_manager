@@ -8,8 +8,8 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="ruf_song_manager"
-        android:icon="@mipmap/ic_launcher">
+        android:label="RUF Song Manager"
+        android:icon="@mipmap/song_manager_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -26,7 +26,9 @@
                 android:value="true" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
     </application>

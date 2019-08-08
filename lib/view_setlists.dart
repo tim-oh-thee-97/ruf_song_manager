@@ -1,7 +1,6 @@
 //Package imports
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:core';
 
 //File imports
@@ -10,6 +9,7 @@ import 'login_page.dart';
 import 'song.dart';
 import 'song_list.dart';
 import 'settings_page.dart';
+import 'nav_service.dart';
 
 class ViewSetlists extends StatefulWidget{
   ViewSetlists({Key key, this.admin}) : super(key: key);
@@ -24,7 +24,6 @@ final String pageTitle = "View Setlists";
 
 class _ViewSetlistsState extends State<ViewSetlists>{
   final mainReference = Firestore.instance.collection('past-setlists');
-  final String _adminKey = 'are_you_admin';
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +34,14 @@ class _ViewSetlistsState extends State<ViewSetlists>{
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => _navToPage(Settings()),
+            onPressed: () => navToPage(context, Settings()),
           ),
         ] : <Widget>[
           IconButton(
             icon: Icon(Icons.exit_to_app),
             iconSize: 32,
-            onPressed: () =>
-                _navToPage(
-                    LoginSignUpPage(auth: Auth(), onSignedIn: _turnOnAdmin,)),
+            onPressed: () => navToPage(context, LoginSignUpPage(auth: Auth(),
+                  onSignedIn: () => turnOnAdmin(context, ViewSetlists(admin: true)),)),
           ),
         ],
       ),
@@ -183,9 +181,8 @@ class _ViewSetlistsState extends State<ViewSetlists>{
             trailing: widget.admin ? IconButton(
               icon: Icon(Icons.edit),
               tooltip: "Edit",
-              //TODO: implement edit song (takes you to song list with "add" button)
               onPressed: () async{
-                Song chosen = await _navToPageWithResult(SongList(admin: widget.admin, select: true,));
+                Song chosen = await navToPageWithResult(context, SongList(admin: widget.admin, select: true,)) as Song;
                 if(chosen != null){
                   String songToChange = "song" + i.toString();
                   List<String> songNum = new List<String>();
@@ -201,25 +198,5 @@ class _ViewSetlistsState extends State<ViewSetlists>{
     }
     songs.add(SizedBox(height: 14));
     return songs;
-  }
-
-  void _navToPage(Widget widget) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => widget)
-    );
-  }
-
-  Future<Song> _navToPageWithResult(Widget widget) async {
-    final Song toReturn = await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => widget)
-    );
-    return toReturn;
-  }
-
-  void _turnOnAdmin() async{
-    final FlutterSecureStorage storage = FlutterSecureStorage();
-    await storage.write(key: _adminKey, value: "true");
-    Navigator.pop(context);
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ViewSetlists(admin: true,)));
   }
 }

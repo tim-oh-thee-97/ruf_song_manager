@@ -208,6 +208,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             });
             return 'Email can\'t be empty';
           }
+          return null;
         },
         onSaved: (value) => _email = value,
       ),
@@ -234,6 +235,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             });
             return 'Email can\'t be empty';
           }
+          return null;
         },
         onSaved: (value) => _password = value,
       ),
