@@ -28,7 +28,6 @@ class _LandingPageState extends State<LandingPage>{
   final String _midsSameKeyKey = 'mid_same';
   final String _adminKey = 'are_you_admin';
 
-  int _setlistLength;
   final int _defaultSetlistLength = 4;
   final int _defaultWksBeforeReuse = 4;
   final String _defaultSpotifyURL =
@@ -47,14 +46,10 @@ class _LandingPageState extends State<LandingPage>{
         _appAdminMode = result;
       });
     });
-    _setDefaultsIfNull().then((result){
-      setState((){
-        _setlistLength = result;
-      });
-    });
+    _setDefaultsIfNull();
   }
 
-  Future<int> _setDefaultsIfNull() async {
+  Future _setDefaultsIfNull() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if(prefs.getInt(_setlistLengthKey) == null)
       prefs.setInt(_setlistLengthKey, _defaultSetlistLength);
@@ -64,7 +59,6 @@ class _LandingPageState extends State<LandingPage>{
       prefs.setString(_spotifyURLKey, _defaultSpotifyURL);
     if(prefs.getBool(_midsSameKeyKey) == null)
       prefs.setBool(_midsSameKeyKey, _defaultMidSameKey);
-    return prefs.getInt(_setlistLengthKey) ?? _defaultSetlistLength;
   }
 
   Future<bool> _getMode() async {
@@ -156,8 +150,7 @@ class _LandingPageState extends State<LandingPage>{
                   padding: EdgeInsets.all(_pad),
                   //TODO: Add Spotify logo next to text?
                   child: buttonText("Open Spotify Playlist"),
-                  //TODO: Implement open Spotify
-                  onPressed: () => _launchSpotifyURL,
+                  onPressed: _launchSpotifyURL,
                 ),
 
                 SizedBox(height: 4*_pad,),
@@ -176,23 +169,17 @@ class _LandingPageState extends State<LandingPage>{
         ),
         heroTag: null,
         tooltip: "New Setlist",
-        onPressed: () => navToPage(context, GenerateSetlist(admin: _appAdminMode, setlistLength: _setlistLength,)),
+        onPressed: () => navToPage(context, GenerateSetlist(admin: _appAdminMode)),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
-  void _launchSpotifyURL() async {
+  Future _launchSpotifyURL() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //Read settings and see if the url is null
-    String url = prefs.getString(_spotifyURLKey) ?? "ERROR";
-    if(url == "ERROR"){
-      Scaffold.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text("Could not launch url. Please check settings."),
-          duration: Duration(seconds: 5),));
-    }
-    else if (await canLaunch(url)) {
+    String url = prefs.getString(_spotifyURLKey) ?? _defaultSpotifyURL;
+    if (await canLaunch(url)) {
       await launch(url);
     }
     else {
@@ -200,7 +187,7 @@ class _LandingPageState extends State<LandingPage>{
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text("Could not launch url. Please check settings."),
           duration: Duration(seconds: 5),));
-      throw 'Could not launch $url';
+      //throw 'Could not launch $url';
     }
   }
 }
