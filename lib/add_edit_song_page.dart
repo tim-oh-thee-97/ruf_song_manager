@@ -21,7 +21,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
 
   final double _pad = 10.0;
   String _errorText;
-  String _title, _key;
+  String _title;
   bool _maj = true;
   bool _begin, _mid, _end;
   String _sharp;
@@ -45,7 +45,6 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
     _errorText = null;
     if(widget.song == null){
       _title = null;
-      _key = null;
       _maj = true;
       _begin = false;
       _mid = false;

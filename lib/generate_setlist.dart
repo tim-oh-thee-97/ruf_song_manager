@@ -121,7 +121,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
                 navToPage(context,
                     LoginSignUpPage(auth: Auth(),
                       onSignedIn: () =>  turnOnAdmin(context,
-                      GenerateSetlist(admin: true, setlistLength: _setlistLength,)),)),
+                      GenerateSetlist(admin: true)),)),
           ),
         ],
       ),

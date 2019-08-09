@@ -150,8 +150,7 @@ class _LandingPageState extends State<LandingPage>{
                   padding: EdgeInsets.all(_pad),
                   //TODO: Add Spotify logo next to text?
                   child: buttonText("Open Spotify Playlist"),
-                  //TODO: Implement open Spotify
-                  onPressed: () => _launchSpotifyURL,
+                  onPressed: _launchSpotifyURL,
                 ),
 
                 SizedBox(height: 4*_pad,),
@@ -176,7 +175,7 @@ class _LandingPageState extends State<LandingPage>{
     );
   }
 
-  void _launchSpotifyURL() async {
+  Future _launchSpotifyURL() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //Read settings and see if the url is null
     String url = prefs.getString(_spotifyURLKey) ?? _defaultSpotifyURL;
@@ -188,7 +187,7 @@ class _LandingPageState extends State<LandingPage>{
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text("Could not launch url. Please check settings."),
           duration: Duration(seconds: 5),));
-      throw 'Could not launch $url';
+      //throw 'Could not launch $url';
     }
   }
 }
