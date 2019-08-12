@@ -329,9 +329,9 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
 	_title = _titleInput.text.trim();
 	_key = _keyInput.text.trim().toUpperCase();
 	
-    if(_title == null || title.isEmpty())
+    if(_title == null || _title.isEmpty)
       setState((){_errorText = "Please input a title.";});
-    else if(_key == null || key.isEmpty())
+    else if(_key == null || _key.isEmpty)
       setState((){_errorText = "Please input a key.";});
     else if(!_possibleKeys.contains(_key))
       setState((){_errorText = "Please input a valid key (A-G).";});
@@ -340,10 +340,10 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
     else{
 	  //Append sharp or flat to key
 	  switch(_sharp){
-	    case _sharpFlat[1]:
+	    case '\u{266F}':
 		  _key += '#';
 		  break;
-		case _sharpFlat[2]:
+		case '\u{266D}':
 		  _key += 'b';
 		  break;
 		default:

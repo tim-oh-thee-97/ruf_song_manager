@@ -95,7 +95,7 @@ class _SongListState extends State<SongList>{
 	String keyText = "ERROR";
 	if(ds['key'].length > 1){
 	  keyText = ds['key'].substring(0,1);
-	  switch(ds['key'].substring(1,2){
+	  switch(ds['key'].substring(1,2)){
 	    case "#":
 		  keyText += "\u{266F}";
 		  break;
