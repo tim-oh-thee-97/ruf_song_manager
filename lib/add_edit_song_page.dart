@@ -21,7 +21,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
 
   final double _pad = 10.0;
   String _errorText;
-  String _title;
+  String _title, _key;
   bool _maj = true;
   bool _begin, _mid, _end;
   String _sharp;
@@ -53,8 +53,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
     }
     else{
       //Populate the fields with the given song
-      _title = widget.song.title;
-      _titleInput.text = _title;
+      _titleInput.text = widget.song.title;
       if(widget.song.key.length == 1){
         _keyInput.text = widget.song.key;
       }
@@ -327,28 +326,40 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
   }
 
   void _validateAndSubmit() async {
-    setState((){
-      _keyInput.text = _keyInput.text.toUpperCase();
-    });
-    if(_titleInput.text.isEmpty)
+	_title = _titleInput.text.trim();
+	_key = _keyInput.text.trim().toUpperCase();
+	
+    if(_title == null || title.isEmpty())
       setState((){_errorText = "Please input a title.";});
-    else if(_keyInput.text.isEmpty)
+    else if(_key == null || key.isEmpty())
       setState((){_errorText = "Please input a key.";});
-    else if(!_possibleKeys.contains(_keyInput.text.toUpperCase()))
+    else if(!_possibleKeys.contains(_key))
       setState((){_errorText = "Please input a valid key (A-G).";});
     else if(!_begin && !_mid && !_end)
       setState((){_errorText = "Please select one or more tags.";});
     else{
+	  //Append sharp or flat to key
+	  switch(_sharp){
+	    case _sharpFlat[1]:
+		  _key += '#';
+		  break;
+		case _sharpFlat[2]:
+		  _key += 'b';
+		  break;
+		default:
+		  break;
+	  }
+	  
       //Submit the song
       Song s = new Song(
-        _titleInput.text,
-        _keyInput.text,
+        _title,
+        _key,
         _maj,
         _begin,
         _mid,
         _end
       );
-      await mainReference.document(_titleInput.text).setData(s.toJson());
+      await mainReference.document(_title).setData(s.toJson());
       Navigator.pop(context);
     }
   }
