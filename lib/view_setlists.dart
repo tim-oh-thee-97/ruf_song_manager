@@ -89,7 +89,7 @@ class _ViewSetlistsState extends State<ViewSetlists>{
     var dateOfSetlist = _createDateOfSetlist(ds.documentID);
 
     return ExpansionTile(
-      key: PageStorageKey<int>(1),
+      key: PageStorageKey<int>(index),
       title: Text(dateOfSetlist,
         style: TextStyle(
           fontWeight: FontWeight.w500,

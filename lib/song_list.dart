@@ -92,21 +92,38 @@ class _SongListState extends State<SongList>{
       BuildContext context, int index) {
     DocumentSnapshot ds = list[index];
     String appendMaj = ds['major'] ? "major" : "minor";
+	String keyText = "ERROR";
+	if(ds['key'].length > 1){
+	  keyText = ds['key'].substring(0,1);
+	  switch(ds['key'].substring(1,2)){
+	    case "#":
+		  keyText += "\u{266F}";
+		  break;
+		case "b":
+		  keyText += "\u{266D}";
+		  break;
+		default:
+		  break;
+	  }
+	}
+	else{
+	  keyText = ds['key'];
+	}
 
     return ListTile(
       title: Text(ds.documentID),
-      subtitle: Text(ds['key'] + " " + appendMaj),
+      subtitle: Text(keyText + " " + appendMaj),
         trailing: widget.admin ? IconButton(
           icon: Icon(Icons.edit),
           tooltip: "Edit",
           onPressed: (){
             Song s = new Song(
               ds.documentID,
-              ds['key'],
-              ds['major'],
-              ds['begin'],
-              ds['mid'],
-              ds['end']
+              ds['key'] ?? "",
+              ds['major'] ?? true,
+              ds['begin'] ?? false,
+              ds['mid'] ?? false,
+              ds['end'] ?? false
             );
             navToPage(context, AddEditSongPage(song: s));
           },
@@ -114,55 +131,51 @@ class _SongListState extends State<SongList>{
       onTap: (){
         Song s = new Song(
             ds.documentID,
-            ds['key'],
-            ds['major'],
-            ds['begin'],
-            ds['mid'],
-            ds['end']
+            ds['key'] ?? "",
+            ds['major'] ?? true,
+            ds['begin'] ?? false,
+            ds['mid'] ?? false,
+            ds['end'] ?? false
         );
-        if(!widget.select){
-          String snackText = "Tags: ";
-          if(ds['begin']){
-            snackText += "begin";
-            if(ds['mid'] || ds['end'])
-              snackText += ", ";
-          }
-          if(ds['mid']){
-            snackText += "mid";
-            if(ds['end'])
-              snackText += ", ";
-          }
-          if(ds['end'])
-            snackText += "end";
-          Scaffold.of(context)
-            ..removeCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(snackText),
-                            duration: Duration(seconds: 2),));
-        }
+        if(!widget.select)
+          _showSnackbar(s);
         else
           Navigator.pop(context, s);
       },
       onLongPress: (){
         if (widget.select) {
-          String snackText = "Tags: ";
-          if (ds['begin']) {
-            snackText += "begin";
-            if (ds['mid'] || ds['end'])
-              snackText += ", ";
-          }
-          if (ds['mid']) {
-            snackText += "mid";
-            if (ds['end'])
-              snackText += ", ";
-          }
-          if (ds['end'])
-            snackText += "end";
-          Scaffold.of(context)
-            ..removeCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(snackText),
-              duration: Duration(seconds: 2),));
+          Song s = new Song(
+            ds.documentID,
+            ds['key'] ?? "",
+            ds['major'] ?? true,
+            ds['begin'] ?? false,
+            ds['mid'] ?? false,
+            ds['end'] ?? false
+          );
+		  _showSnackbar(s);
         }
       },
     );
+  }
+  
+  void _showSnackbar(Song s){
+    String snackText = "Tags: ";
+	if(s.begin){
+	  snackText += "begin";
+	  if(s.mid || s.end)
+	    snackText += ", ";
+	}
+	if(s.mid){
+	  snackText += "mid";
+	  if(s.end)
+	    snackText += ", ";
+	}
+	if(s.end)
+	  snackText += "end";
+	
+	Scaffold.of(context)
+	  ..removeCurrentSnackBar()
+	  ..showSnackBar(SnackBar(content: Text(snackText),
+	    duration: Duration(seconds: 2),));
   }
 }
