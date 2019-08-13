@@ -220,7 +220,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
       padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
       child: new TextFormField(
         maxLines: 1,
-        obscureText: false, //TODO: Change this to true
+        obscureText: true,
         autofocus: false,
         decoration: new InputDecoration(
             hintText: 'Password',
