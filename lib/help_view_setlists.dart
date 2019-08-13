@@ -4,12 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:core';
 
 //File imports
-import 'authentication.dart';
-import 'login_page.dart';
-import 'song.dart';
-import 'song_list.dart';
-import 'settings_page.dart';
-import 'nav_service.dart';
 
 class HelpViewSetlists extends StatefulWidget{
   HelpViewSetlists({Key key}) : super(key: key);
@@ -30,20 +24,6 @@ class _HelpViewSetlistsState extends State<HelpViewSetlists>{
     return Scaffold(
       appBar: AppBar(
         title: Text(pageTitle, textScaleFactor: 1.1,),
-        actions: widget.admin ? <Widget>[
-          IconButton(
-            icon: Icon(Icons.settings),
-            iconSize: 32,
-            onPressed: () => navToPage(context, Settings()),
-          ),
-        ] : <Widget>[
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            iconSize: 32,
-            onPressed: () => navToPage(context, LoginSignUpPage(auth: Auth(),
-                  onSignedIn: () => turnOnAdmin(context, ViewSetlists(admin: true)),)),
-          ),
-        ],
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -178,22 +158,12 @@ class _HelpViewSetlistsState extends State<HelpViewSetlists>{
       songs.add(
           ListTile(
             title: _createRichText("Song " + i.toString() + ": ", ds[lookup]),
-            trailing: widget.admin ? IconButton(
+            trailing: IconButton(
               icon: Icon(Icons.edit),
               tooltip: "Edit",
-              onPressed: () async{
-                Song chosen = await navToPageWithResult(context, SongList(admin: widget.admin, select: true,)) as Song;
-                if(chosen != null){
-                  String songToChange = "song" + i.toString();
-                  List<String> songNum = new List<String>();
-                  songNum.add(songToChange);
-                  List<String> newSong = new List<String>();
-                  newSong.add(chosen.title);
-                  mainReference.document(ds.documentID)
-                      .updateData(Map.fromIterables(songNum, newSong));
-                }
-              },
-            ) : null,
+              //TODO: Implement onPressed (tutorial)
+              onPressed: null,
+            ),
           ));
     }
     songs.add(SizedBox(height: 14));
