@@ -326,8 +326,12 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
   }
 
   void _validateAndSubmit() async {
-	_title = _titleInput.text.trim();
-	_key = _keyInput.text.trim().toUpperCase();
+    setState((){
+      _title = _titleInput.text.trim();
+      _key = _keyInput.text.trim().toUpperCase();
+      _title = _fixCapitalization(_title);
+    });
+	  DocumentSnapshot thisSong = await mainReference.document(_title).get();
 	
     if(_title == null || _title.isEmpty)
       setState((){_errorText = "Please input a title.";});
@@ -337,6 +341,9 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
       setState((){_errorText = "Please input a valid key (A-G).";});
     else if(!_begin && !_mid && !_end)
       setState((){_errorText = "Please select one or more tags.";});
+    else if(widget.song == null && thisSong.data != null){
+      setState((){_errorText = "This song already exists.";});
+    }
     else{
 	  //Append sharp or flat to key
 	  switch(_sharp){
@@ -362,5 +369,32 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
       await mainReference.document(_title).setData(s.toJson());
       Navigator.pop(context);
     }
+  }
+
+  String _fixCapitalization(String s){
+    List<String> words = s.toLowerCase().split(" ");
+    final List<String> dontCap = ["a", "an", "the",
+      "and", "but", "or", "nor", "for",
+      "with", "in", "on", "at", "to", "from", "by", "as", "of"];
+    //Always capitalize first and last
+    words[0] = _capitalize(words[0]);
+    words[words.length-1] = _capitalize(words[words.length-1]);
+
+    for(int i = 1; i < words.length-1; i++){
+      if(!dontCap.contains(words[i]))
+        words[i] = _capitalize(words[i]);
+    }
+    return words.join(" ");
+  }
+
+  String _capitalize(String s){
+    if(s.isNotEmpty){
+      if(s.length == 1)
+        return s.toUpperCase();
+      else
+        return s.substring(0,1).toUpperCase() + s.substring(1).toLowerCase();
+    }
+    else
+      return "";
   }
 }

@@ -138,7 +138,7 @@ class _SongListState extends State<SongList>{
             ds['end'] ?? false
         );
         if(!widget.select)
-          _showSnackbar(s);
+          _showSnackbar(s, context);
         else
           Navigator.pop(context, s);
       },
@@ -152,13 +152,13 @@ class _SongListState extends State<SongList>{
             ds['mid'] ?? false,
             ds['end'] ?? false
           );
-		  _showSnackbar(s);
+		  _showSnackbar(s, context);
         }
       },
     );
   }
   
-  void _showSnackbar(Song s){
+  void _showSnackbar(Song s, BuildContext ctxt){
     String snackText = "Tags: ";
 	if(s.begin){
 	  snackText += "begin";
@@ -172,10 +172,14 @@ class _SongListState extends State<SongList>{
 	}
 	if(s.end)
 	  snackText += "end";
-	
-	Scaffold.of(context)
-	  ..removeCurrentSnackBar()
-	  ..showSnackBar(SnackBar(content: Text(snackText),
-	    duration: Duration(seconds: 2),));
+
+	_displaySnackBar(ctxt, Text(snackText));
+  }
+
+  void _displaySnackBar(BuildContext context, Widget toShow){
+    Scaffold.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: toShow,
+        duration: Duration(seconds: 2),));
   }
 }
