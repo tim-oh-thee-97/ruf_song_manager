@@ -26,6 +26,7 @@ void navToLandingPage(BuildContext context){
 void turnOnAdmin(BuildContext context, Widget widget, {bool pageOnTop = true}) async{
   final FlutterSecureStorage storage = FlutterSecureStorage();
   await storage.write(key: _adminKey, value: "true");
+  navToLandingPage(context);
   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingPage()));
   if(pageOnTop)
     Navigator.push(context, MaterialPageRoute(builder: (context) => widget));
