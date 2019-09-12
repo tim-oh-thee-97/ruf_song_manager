@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 //File imports
 import 'settings_page.dart';
@@ -20,7 +21,8 @@ class LandingPage extends StatefulWidget{
   _LandingPageState createState() => _LandingPageState();
 }
 
-class _LandingPageState extends State<LandingPage>{
+class _LandingPageState extends State<LandingPage> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   final String _setlistLengthKey = 'setlist_length';
   final String _wksBeforeReuseKey = 'wks_before_reuse';
@@ -47,6 +49,18 @@ class _LandingPageState extends State<LandingPage>{
       });
     });
     _setDefaultsIfNull();
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> msg) async{
+        print("onMessage: $msg");
+      },
+      onLaunch: (Map<String, dynamic> msg) async{
+        print("onLaunch: $msg");
+      }
+    );
+    _firebaseMessaging.requestNotificationPermissions();
+    _firebaseMessaging.getToken().then((tk){
+      print("token: $tk");
+    });
   }
 
   Future _setDefaultsIfNull() async {
