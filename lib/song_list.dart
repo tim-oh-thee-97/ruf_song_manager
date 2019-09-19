@@ -92,23 +92,23 @@ class _SongListState extends State<SongList>{
       BuildContext context, int index) {
     DocumentSnapshot ds = list[index];
     String appendMaj = ds['major'] ? "major" : "minor";
-	String keyText = "ERROR";
-	if(ds['key'].length > 1){
-	  keyText = ds['key'].substring(0,1);
-	  switch(ds['key'].substring(1,2)){
-	    case "#":
-		  keyText += "\u{266F}";
-		  break;
-		case "b":
-		  keyText += "\u{266D}";
-		  break;
-		default:
-		  break;
-	  }
-	}
-	else{
-	  keyText = ds['key'];
-	}
+    String keyText = "ERROR";
+    if(ds['key'].length > 1){
+      keyText = ds['key'].substring(0,1);
+      switch(ds['key'].substring(1,2)){
+        case "#":
+        keyText += "\u{266F}";
+        break;
+      case "b":
+        keyText += "\u{266D}";
+        break;
+      default:
+        break;
+      }
+    }
+    else{
+      keyText = ds['key'];
+    }
 
     return ListTile(
       title: Text(ds.documentID),
@@ -158,22 +158,86 @@ class _SongListState extends State<SongList>{
     );
   }
   
-  void _showSnackbar(Song s, BuildContext ctxt){
+  void _showSnackbar(Song s, BuildContext ctxt) async {
     String snackText = "Tags: ";
-	if(s.begin){
-	  snackText += "begin";
-	  if(s.mid || s.end)
-	    snackText += ", ";
-	}
-	if(s.mid){
-	  snackText += "mid";
-	  if(s.end)
-	    snackText += ", ";
-	}
-	if(s.end)
-	  snackText += "end";
+	  if(s.begin){
+	    snackText += "begin";
+	    if(s.mid || s.end)
+	     snackText += ", ";
+	  }
+    if(s.mid){
+      snackText += "mid";
+      if(s.end)
+        snackText += ", ";
+    }
+    if(s.end)
+      snackText += "end";
 
-	_displaySnackBar(ctxt, Text(snackText));
+    snackText += "\n" + await _findLastUsedDate(s);
+
+    _displaySnackBar(ctxt, Text(snackText));
+  }
+
+  Future<String> _findLastUsedDate(Song s) async {
+    QuerySnapshot listOfSetlists = await Firestore.instance.collection('past-setlists').getDocuments();
+    String result = "Last used ";
+    for(int i = listOfSetlists.documents.length-1; i > 0; i--){
+      if(listOfSetlists.documents[i].data.containsValue(s.title)){
+        result += _createDateOfSetlist(listOfSetlists.documents[i].documentID);
+        return result;
+      }
+    }
+    return result + "never";
+  }
+
+  String _createDateOfSetlist(String unformatted){
+    int month = int.tryParse(unformatted.substring(0,2));
+    String day = unformatted.substring(2,4);
+    String year = unformatted.substring(4);
+    String fullDate = "";
+    switch(month){
+      case 1:
+        fullDate += "January";
+        break;
+      case 2:
+        fullDate += "February";
+        break;
+      case 3:
+        fullDate += "March";
+        break;
+      case 4:
+        fullDate += "April";
+        break;
+      case 5:
+        fullDate += "May";
+        break;
+      case 6:
+        fullDate += "June";
+        break;
+      case 7:
+        fullDate += "July";
+        break;
+      case 8:
+        fullDate += "August";
+        break;
+      case 9:
+        fullDate += "September";
+        break;
+      case 10:
+        fullDate += "October";
+        break;
+      case 11:
+        fullDate += "November";
+        break;
+      case 12:
+        fullDate += "December";
+        break;
+      default:
+        fullDate += "ERROR";
+        break;
+    }
+    fullDate += " " + day + ", " + year;
+    return fullDate;
   }
 
   void _displaySnackBar(BuildContext context, Widget toShow){
