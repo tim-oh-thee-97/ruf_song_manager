@@ -181,7 +181,7 @@ class _SongListState extends State<SongList>{
   Future<String> _findLastUsedDate(Song s) async {
     QuerySnapshot listOfSetlists = await Firestore.instance.collection('past-setlists').getDocuments();
     String result = "Last used ";
-    for(int i = listOfSetlists.documents.length-1; i > 0; i--){
+    for(int i = listOfSetlists.documents.length-1; i >= 0; i--){
       if(listOfSetlists.documents[i].data.containsValue(s.title)){
         result += _createDateOfSetlist(listOfSetlists.documents[i].documentID);
         return result;
