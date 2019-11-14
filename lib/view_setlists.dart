@@ -85,7 +85,7 @@ class _ViewSetlistsState extends State<ViewSetlists>{
 
   Widget _buildSetlistList(List<DocumentSnapshot> list,
       BuildContext context, int index) {
-    DocumentSnapshot ds = list[index];
+    DocumentSnapshot ds = list[list.length - (index+1)];
     var dateOfSetlist = _createDateOfSetlist(ds.documentID);
 
     return ExpansionTile(
