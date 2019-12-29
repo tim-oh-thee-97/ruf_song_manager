@@ -202,7 +202,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
               color: Colors.grey,
             )),
         validator: (value) {
-          if (value.isEmpty) {
+          if (value.trim().isEmpty) {
             setState(() {
               _isLoading = false;
             });
@@ -210,7 +210,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
           }
           return null;
         },
-        onSaved: (value) => _email = value,
+        onSaved: (value) => _email = value.trim(),
       ),
     );
   }
@@ -233,7 +233,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             setState(() {
               _isLoading = false;
             });
-            return 'Email can\'t be empty';
+            return 'Password can\'t be empty';
           }
           return null;
         },

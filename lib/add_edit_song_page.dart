@@ -8,9 +8,10 @@ import 'settings_page.dart';
 import 'nav_service.dart';
 
 class AddEditSongPage extends StatefulWidget{
-  AddEditSongPage({Key key, this.song}) : super(key: key);
+  AddEditSongPage({Key key, this.song, this.inSongList}) : super(key: key);
 
   final Song song;
+  final bool inSongList;
 
   @override
   _AddEditSongPageState createState() => _AddEditSongPageState();
@@ -24,6 +25,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
   String _title, _key;
   bool _maj = true;
   bool _begin, _mid, _end;
+  int _saveForever = 0;
   String _sharp;
 
   static List<String> _sharpFlat = <String>['  ', '\u{266F}', '\u{266D}'];
@@ -248,6 +250,39 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
           },
         ),
       ) : Container(),
+
+      widget.song == null && !widget.inSongList ? Container(
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Radio(
+                  groupValue: _saveForever,
+                  value: 0,
+                  onChanged: _radioChange,
+                ),
+                FlatButton(
+                  onPressed: () => _radioChange(0),
+                  child: Text("Save this song for this setlist only"),
+                ),
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Radio(
+                  groupValue: _saveForever,
+                  value: 1,
+                  onChanged: _radioChange,
+                ),
+                FlatButton(
+                  onPressed: () => _radioChange(1),
+                  child: Text("Save this song into the master song list"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ) : Container(),
     ];
 
     return Scaffold(
@@ -366,8 +401,9 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
         _mid,
         _end
       );
+	  if(_saveForever == 1)
       await mainReference.document(_title).setData(s.toJson());
-      Navigator.pop(context);
+	  Navigator.pop(context, s);
     }
   }
 
@@ -396,5 +432,11 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
     }
     else
       return "";
+  }
+
+  void _radioChange(int value){
+    setState((){
+      _saveForever = value;
+    });
   }
 }

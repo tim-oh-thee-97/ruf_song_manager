@@ -39,7 +39,8 @@ class _SongListState extends State<SongList>{
             iconSize: 32,
             onPressed: () =>
                 navToPage(context, LoginSignUpPage(auth: Auth(),
-                  onSignedIn: () => turnOnAdmin(context, SongList(admin: true, select: widget.select,)),)),
+                  onSignedIn: () => turnOnAdmin(context,
+                      SongList(admin: true, select: widget.select)),)),
           ),
         ],
       ),
@@ -83,7 +84,12 @@ class _SongListState extends State<SongList>{
         child: Icon(Icons.add),
         heroTag: null,
         tooltip: "New Song",
-        onPressed: () => navToPage(context, AddEditSongPage(song: null)),
+        onPressed: () async {
+          Song s = await navToPageWithResult(context, AddEditSongPage(song: null, inSongList: !widget.select,));
+          if(s != null){
+            Navigator.pop(context,s);
+          }
+        },
       ) : null,
     );
   }
