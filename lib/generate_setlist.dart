@@ -224,7 +224,14 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
           else
             _submitSetlist(nextWedStamp);
         },
-      ) : null,
+      ) :
+      FloatingActionButton.extended(
+        onPressed: null,
+        heroTag: null,
+        label: Text("Please sign in to save a setlist.",
+        textScaleFactor: 1.3,),
+        backgroundColor: Colors.blueGrey[400],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
