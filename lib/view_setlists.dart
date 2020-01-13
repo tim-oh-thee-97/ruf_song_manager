@@ -122,9 +122,10 @@ class _ViewSetlistsState extends State<ViewSetlists>{
   }
 
   String _createDateOfSetlist(String unformatted){
-    int month = int.tryParse(unformatted.substring(0,2));
-    String day = unformatted.substring(2,4);
-    String year = unformatted.substring(4);
+    //Format is YYYYMMDD
+    int month = int.tryParse(unformatted.substring(4,6));
+    String day = unformatted.substring(6);
+    String year = unformatted.substring(0,4);
     String fullDate = "";
     switch(month){
       case 1:

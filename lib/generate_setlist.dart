@@ -165,16 +165,16 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
         heroTag: null,
         tooltip: "Use Setlist",
         onPressed: () async {
-          //Generate timestamp for next Wednesday (MMDDYYYY)
+          //Generate timestamp for next Wednesday (YYYYMMDD)
           DateTime today = DateTime.now();
           //Get today's DOW and number of days til Wednesday
           int daysTilWed = DateTime.wednesday - today.weekday;
           if(daysTilWed < 0 || (daysTilWed == 0 && today.hour >= 18))
             daysTilWed += 7;
           DateTime nextWed = today.add(Duration(days: daysTilWed));
-          String nextWedStamp = nextWed.month.toString().padLeft(2, '0')
-              + nextWed.day.toString().padLeft(2, '0')
-              + nextWed.year.toString().padLeft(4, '0');
+          String nextWedStamp = nextWed.year.toString().padLeft(4, '0')
+              + nextWed.month.toString().padLeft(2, '0')
+              + nextWed.day.toString().padLeft(2, '0');
 
           //Check to see if next Wednesday already has a setlist
           DocumentSnapshot snap = await setlistReference.document(nextWedStamp).get();
@@ -371,9 +371,9 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
   }
 
   String _createDateOfNextWed(String unformatted){
-    int month = int.tryParse(unformatted.substring(0,2));
-    String day = unformatted.substring(2,4);
-    String year = unformatted.substring(4);
+    int month = int.tryParse(unformatted.substring(4,6));
+    String day = unformatted.substring(6);
+    String year = unformatted.substring(0,4);
     String fullDate = "";
     switch(month){
       case 1:

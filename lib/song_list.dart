@@ -197,9 +197,9 @@ class _SongListState extends State<SongList>{
   }
 
   String _createDateOfSetlist(String unformatted){
-    int month = int.tryParse(unformatted.substring(0,2));
-    String day = unformatted.substring(2,4);
-    String year = unformatted.substring(4);
+    int month = int.tryParse(unformatted.substring(4,6));
+    String day = unformatted.substring(6);
+    String year = unformatted.substring(0,4);
     String fullDate = "";
     switch(month){
       case 1:
