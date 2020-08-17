@@ -273,7 +273,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
     Random gen = Random.secure();
 
     //Populate first song
-    while(true){
+    while(allSongs.length > 0){
       int rand = gen.nextInt(allSongs.length);
       Song tryThis = allSongs[rand];
       if(tryThis.begin && !invalidSongs.contains(tryThis)){
@@ -287,7 +287,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
     int numMid = 0;
     String midKey;
     for(int i = 1; i < _setlistLength-1; i++)
-      while(true){
+      while(allSongs.length > 0){
         if(numMid == 1 && _midsSameKey){
           midKey = setlist[1].key;
           print(midKey);
@@ -311,7 +311,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
           print("mid rejected " + tryThis.toString());
       }
     //Populate last song
-    while(true){
+    while(allSongs.length > 0){
       int rand = gen.nextInt(allSongs.length);
       Song tryThis = allSongs[rand];
       if(tryThis.end && !setlist.contains(tryThis) && !invalidSongs.contains(tryThis)){

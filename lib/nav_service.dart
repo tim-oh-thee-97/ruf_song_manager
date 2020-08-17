@@ -37,6 +37,6 @@ void turnOffAdmin(BuildContext context) async{
   final FlutterSecureStorage storage = FlutterSecureStorage();
   await storage.write(key: _adminKey, value: "false");
   navToLandingPage(context);
-  Navigator.pop(context);
+  //Navigator.pop(context);
   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingPage()));
 }

@@ -113,9 +113,9 @@ class _LandingPageState extends State<LandingPage>{
         child: Center(
           child: Padding(
             padding: EdgeInsets.fromLTRB(
-                6+MediaQuery.of(context).size.width * 0.15,
+                6 + MediaQuery.of(context).size.width * 0.15,
                 6,
-                6+MediaQuery.of(context).size.width * 0.15,
+                6 + MediaQuery.of(context).size.width * 0.15,
                 6
             ),
             child: Column(

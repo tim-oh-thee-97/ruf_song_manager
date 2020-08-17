@@ -1,6 +1,7 @@
 //Package imports
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ruf_song_manager/main.dart';
 
 //File imports
 import 'song.dart';
@@ -18,7 +19,7 @@ class AddEditSongPage extends StatefulWidget{
 }
 
 class _AddEditSongPageState extends State<AddEditSongPage>{
-  final mainReference = Firestore.instance.collection('song-list');
+  var mainReference = Firestore.instance.collection('song-list');
 
   final double _pad = 10.0;
   String _errorText;
@@ -45,7 +46,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
   void initState(){
     super.initState();
     _errorText = null;
-    if(widget.song == null){
+    if (widget.song == null) {
       _title = null;
       _maj = true;
       _begin = false;
@@ -53,7 +54,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
       _end = false;
       _sharp = _sharpFlat[0];
     }
-    else{
+    else {
       //Populate the fields with the given song
       _titleInput.text = widget.song.title;
       if(widget.song.key.length == 1){
@@ -90,7 +91,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
 
       TextField(
         controller: _titleInput,
-        onEditingComplete: (){
+        onEditingComplete: () {
           FocusScope.of(context).requestFocus(FocusNode());
         },
         textCapitalization: TextCapitalization.sentences,
@@ -401,8 +402,10 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
         _mid,
         _end
       );
-	  if(_saveForever == 1)
+
+	  if (_saveForever == 1 || widget.song == null) {
       await mainReference.document(_title).setData(s.toJson());
+    }
 	  Navigator.pop(context, s);
     }
   }

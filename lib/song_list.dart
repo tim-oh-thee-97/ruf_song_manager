@@ -86,8 +86,8 @@ class _SongListState extends State<SongList>{
         tooltip: "New Song",
         onPressed: () async {
           Song s = await navToPageWithResult(context, AddEditSongPage(song: null, inSongList: !widget.select,));
-          if(s != null){
-            Navigator.pop(context,s);
+          if (s != null) {
+            Navigator.pop(context, s);
           }
         },
       ) : null,
