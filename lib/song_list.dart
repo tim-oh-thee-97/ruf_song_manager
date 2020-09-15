@@ -7,7 +7,7 @@ import 'authentication.dart';
 import 'login_page.dart';
 import 'song.dart';
 import 'add_edit_song_page.dart';
-import 'settings_page.dart';
+import 'settings_page.dart' as mySettings;
 import 'nav_service.dart';
 
 class SongList extends StatefulWidget{
@@ -20,18 +20,18 @@ class SongList extends StatefulWidget{
 }
 
 class _SongListState extends State<SongList>{
-  final mainReference = Firestore.instance.collection('song-list');
+  final mainReference = FirebaseFirestore.instance.collection('song-list');
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold (
       appBar: AppBar(
         title: Text(widget.select ? "Choose a Song" : "Song List", textScaleFactor: 1.1,),
         actions: widget.admin ? <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => navToPage(context, Settings()),
+            onPressed: () => navToPage(context, mySettings.Settings()),
           ),
         ] : <Widget>[
           IconButton(
@@ -69,7 +69,7 @@ class _SongListState extends State<SongList>{
                 children: <Widget>[LinearProgressIndicator()],
               );
 
-            List<DocumentSnapshot> docList = snapshot.data.documents;
+            List<DocumentSnapshot> docList = snapshot.data.docs;
 
             return ListView.builder(
               itemBuilder: (context, index) =>
@@ -97,11 +97,11 @@ class _SongListState extends State<SongList>{
   Widget _buildSongList(List<DocumentSnapshot> list,
       BuildContext context, int index) {
     DocumentSnapshot ds = list[index];
-    String appendMaj = ds['major'] ? "major" : "minor";
+    String appendMaj = ds.get('major') ? "major" : "minor";
     String keyText = "ERROR";
-    if(ds['key'].length > 1){
-      keyText = ds['key'].substring(0,1);
-      switch(ds['key'].substring(1,2)){
+    if(ds.get('key').length > 1){
+      keyText = ds.get('key').substring(0,1);
+      switch(ds.get('key').substring(1,2)){
         case "#":
         keyText += "\u{266F}";
         break;
@@ -113,35 +113,35 @@ class _SongListState extends State<SongList>{
       }
     }
     else{
-      keyText = ds['key'];
+      keyText = ds.get('key');
     }
 
     return ListTile(
-      title: Text(ds.documentID),
+      title: Text(ds.id),
       subtitle: Text(keyText + " " + appendMaj),
         trailing: widget.admin ? IconButton(
           icon: Icon(Icons.edit),
           tooltip: "Edit",
           onPressed: (){
             Song s = new Song(
-              ds.documentID,
-              ds['key'] ?? "",
-              ds['major'] ?? true,
-              ds['begin'] ?? false,
-              ds['mid'] ?? false,
-              ds['end'] ?? false
+              ds.id,
+              ds.get('key') ?? "",
+              ds.get('major') ?? true,
+              ds.get('begin') ?? false,
+              ds.get('mid') ?? false,
+              ds.get('end') ?? false
             );
             navToPage(context, AddEditSongPage(song: s));
           },
         ) : null,
       onTap: (){
         Song s = new Song(
-            ds.documentID,
-            ds['key'] ?? "",
-            ds['major'] ?? true,
-            ds['begin'] ?? false,
-            ds['mid'] ?? false,
-            ds['end'] ?? false
+            ds.id,
+            ds.get('key') ?? "",
+            ds.get('major') ?? true,
+            ds.get('begin') ?? false,
+            ds.get('mid') ?? false,
+            ds.get('end') ?? false
         );
         if(!widget.select)
           _showSnackbar(s, context);
@@ -151,12 +151,12 @@ class _SongListState extends State<SongList>{
       onLongPress: (){
         if (widget.select) {
           Song s = new Song(
-            ds.documentID,
-            ds['key'] ?? "",
-            ds['major'] ?? true,
-            ds['begin'] ?? false,
-            ds['mid'] ?? false,
-            ds['end'] ?? false
+            ds.id,
+            ds.get('key') ?? "",
+            ds.get('major') ?? true,
+            ds.get('begin') ?? false,
+            ds.get('mid') ?? false,
+            ds.get('end') ?? false
           );
 		  _showSnackbar(s, context);
         }
@@ -185,11 +185,11 @@ class _SongListState extends State<SongList>{
   }
 
   Future<String> _findLastUsedDate(Song s) async {
-    QuerySnapshot listOfSetlists = await Firestore.instance.collection('past-setlists').getDocuments();
+    QuerySnapshot listOfSetlists = await FirebaseFirestore.instance.collection('past-setlists').get();
     String result = "Last used ";
-    for(int i = listOfSetlists.documents.length-1; i >= 0; i--){
-      if(listOfSetlists.documents[i].data.containsValue(s.title)){
-        result += _createDateOfSetlist(listOfSetlists.documents[i].documentID);
+    for(int i = listOfSetlists.docs.length-1; i >= 0; i--){
+      if(listOfSetlists.docs[i].data().containsValue(s.title)){
+        result += _createDateOfSetlist(listOfSetlists.docs[i].id);
         return result;
       }
     }

@@ -34,6 +34,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1061940324688:android:2f7fc8eb4394034d22a455",
+        "android_client_info": {
+          "package_name": "edu.mercer.muse"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1061940324688-q53rbjmfl3j7oii73s8r3k5jnacm28j6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeUqFtk7WQqk8L1lvKECRPt52pe7jyZx4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1061940324688-q53rbjmfl3j7oii73s8r3k5jnacm28j6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

@@ -1,5 +1,6 @@
 //Package imports
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 //File imports
 import 'landing_page.dart';
@@ -7,16 +8,21 @@ import 'landing_page.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  static final myFirebase = Firebase.initializeApp();
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'RUF Song Manager',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'RUF Song Manager'),
-      debugShowCheckedModeBanner: false,
+    return FutureBuilder (
+      future: Firebase.initializeApp(),
+      builder: (context, snapshot) => MaterialApp (
+        title: 'RUF Song Manager',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: MyHomePage(title: 'RUF Song Manager'),
+        debugShowCheckedModeBanner: false,
+      )
     );
   }
 }

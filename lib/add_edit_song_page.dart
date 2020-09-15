@@ -1,11 +1,10 @@
 //Package imports
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ruf_song_manager/main.dart';
 
 //File imports
 import 'song.dart';
-import 'settings_page.dart';
+import 'settings_page.dart' as mySettings;
 import 'nav_service.dart';
 
 class AddEditSongPage extends StatefulWidget{
@@ -19,7 +18,7 @@ class AddEditSongPage extends StatefulWidget{
 }
 
 class _AddEditSongPageState extends State<AddEditSongPage>{
-  var mainReference = Firestore.instance.collection('song-list');
+  var mainReference = FirebaseFirestore.instance.collection('song-list');
 
   final double _pad = 10.0;
   String _errorText;
@@ -233,7 +232,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
                     FlatButton(
                       child: Text("Yes"),
                       onPressed: () {
-                        mainReference.document(widget.song.title).delete();
+                        mainReference.doc(widget.song.title).delete();
                         Navigator.pop(context);
                         Navigator.pop(context);
                       },
@@ -294,7 +293,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => navToPage(context, Settings()),
+            onPressed: () => navToPage(context, mySettings.Settings()),
           ),
         ],
       ),
@@ -367,7 +366,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
       _key = _keyInput.text.trim().toUpperCase();
       _title = _fixCapitalization(_title);
     });
-	  DocumentSnapshot thisSong = await mainReference.document(_title).get();
+	  DocumentSnapshot thisSong = await mainReference.doc(_title).get();
 	
     if(_title == null || _title.isEmpty)
       setState((){_errorText = "Please input a title.";});
@@ -377,7 +376,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
       setState((){_errorText = "Please input a valid key (A-G).";});
     else if(!_begin && !_mid && !_end)
       setState((){_errorText = "Please select one or more tags.";});
-    else if(widget.song == null && thisSong.data != null){
+    else if(widget.song == null && thisSong.data() != null){
       setState((){_errorText = "This song already exists.";});
     }
     else{
@@ -404,7 +403,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
       );
 
 	  if (_saveForever == 1 || widget.song == null) {
-      await mainReference.document(_title).setData(s.toJson());
+      await mainReference.doc(_title).set(s.toJson());
     }
 	  Navigator.pop(context, s);
     }

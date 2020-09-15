@@ -8,7 +8,7 @@ import 'authentication.dart';
 import 'login_page.dart';
 import 'song.dart';
 import 'song_list.dart';
-import 'settings_page.dart';
+import 'settings_page.dart' as mySettings;
 import 'nav_service.dart';
 
 class ViewSetlists extends StatefulWidget{
@@ -23,7 +23,7 @@ class ViewSetlists extends StatefulWidget{
 final String pageTitle = "View Setlists";
 
 class _ViewSetlistsState extends State<ViewSetlists>{
-  final mainReference = Firestore.instance.collection('past-setlists');
+  final mainReference = FirebaseFirestore.instance.collection('past-setlists');
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class _ViewSetlistsState extends State<ViewSetlists>{
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => navToPage(context, Settings()),
+            onPressed: () => navToPage(context, mySettings.Settings()),
           ),
         ] : <Widget>[
           IconButton(
@@ -70,7 +70,7 @@ class _ViewSetlistsState extends State<ViewSetlists>{
                 children: <Widget>[LinearProgressIndicator()],
               );
 
-            List<DocumentSnapshot> docList = snapshot.data.documents;
+            List<DocumentSnapshot> docList = snapshot.data.docs;
 
             return ListView.builder(
               itemBuilder: (context, index) =>
@@ -86,7 +86,7 @@ class _ViewSetlistsState extends State<ViewSetlists>{
   Widget _buildSetlistList(List<DocumentSnapshot> list,
       BuildContext context, int index) {
     DocumentSnapshot ds = list[list.length - (index+1)];
-    var dateOfSetlist = _createDateOfSetlist(ds.documentID);
+    var dateOfSetlist = _createDateOfSetlist(ds.id);
 
     return ExpansionTile(
       key: PageStorageKey<int>(index),
@@ -174,11 +174,11 @@ class _ViewSetlistsState extends State<ViewSetlists>{
 
   List<Widget> _populateOneSetlist(DocumentSnapshot ds){
     List<Widget> songs = List<Widget>();
-    for(int i = 1; i <= ds.data.length; i++){
+    for(int i = 1; i <= ds.data().length; i++){
       String lookup = 'song' + i.toString();
       songs.add(
           ListTile(
-            title: _createRichText("Song " + i.toString() + ": ", ds[lookup]),
+            title: _createRichText("Song " + i.toString() + ": ", ds.get(lookup)),
             trailing: widget.admin ? IconButton(
               icon: Icon(Icons.edit),
               tooltip: "Edit",
@@ -190,8 +190,8 @@ class _ViewSetlistsState extends State<ViewSetlists>{
                   songNum.add(songToChange);
                   List<String> newSong = new List<String>();
                   newSong.add(chosen.title);
-                  mainReference.document(ds.documentID)
-                      .updateData(Map.fromIterables(songNum, newSong));
+                  mainReference.doc(ds.id)
+                      .update(Map.fromIterables(songNum, newSong));
                 }
               },
             ) : null,

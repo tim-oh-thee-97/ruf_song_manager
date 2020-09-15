@@ -7,7 +7,7 @@ import 'dart:math';
 //File imports
 import 'song.dart';
 import 'song_list.dart';
-import 'settings_page.dart';
+import 'settings_page.dart' as mySettings;
 import 'authentication.dart';
 import 'login_page.dart';
 import 'nav_service.dart';
@@ -25,8 +25,8 @@ final String pageTitle = "Generate Setlist";
 enum SongType { begin, mid, end }
 
 class _GenerateSetlistState extends State<GenerateSetlist>{
-  final mainReference = Firestore.instance.collection('song-list');
-  final setlistReference = Firestore.instance.collection('past-setlists');
+  final mainReference = FirebaseFirestore.instance.collection('song-list');
+  final setlistReference = FirebaseFirestore.instance.collection('past-setlists');
   List<Song> songList = List<Song>();
   List<Song> setlist = List<Song>();
   List<Song> invalidSongs = List<Song>();
@@ -76,26 +76,26 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
   }
 
   Future<bool> _getSongList() async{
-    await mainReference.getDocuments().then((contentsOfSongList){
-      for(int i = 0; i < contentsOfSongList.documents.length; i++){
-        DocumentSnapshot song = contentsOfSongList.documents[i];
+    await mainReference.get().then((contentsOfSongList){
+      for(int i = 0; i < contentsOfSongList.docs.length; i++){
+        DocumentSnapshot song = contentsOfSongList.docs[i];
         songList.add(new Song(
-            song.documentID,
-            song['key'],
-            song['major'],
-            song['begin'],
-            song['mid'],
-            song['end']
+            song.id,
+            song.get('key'),
+            song.get('major'),
+            song.get('begin'),
+            song.get('mid'),
+            song.get('end')
         ));
       }
     });
-    await setlistReference.getDocuments().then((pastSetlists){
-      int theRange = min(pastSetlists.documents.length, _wksBeforeReuse);
+    await setlistReference.get().then((pastSetlists){
+      int theRange = min(pastSetlists.docs.length, _wksBeforeReuse);
       for(int i = 1; i <= theRange; i++){
-        DocumentSnapshot setlist = pastSetlists.documents[pastSetlists.documents.length-i];
-        for(int j = 1; j <= setlist.data.length; j++){
+        DocumentSnapshot setlist = pastSetlists.docs[pastSetlists.docs.length-i];
+        for(int j = 1; j <= setlist.data().length; j++){
           String lookup = "song" + j.toString();
-          invalidSongs.addAll(songList.where((s) => s.title == setlist[lookup]));
+          invalidSongs.addAll(songList.where((s) => s.title == setlist.get(lookup)));
         }
       }
     });
@@ -111,7 +111,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 32,
-            onPressed: () => navToPage(context, Settings()),
+            onPressed: () => navToPage(context, mySettings.Settings()),
           ),
         ] : <Widget>[
           IconButton(
@@ -177,7 +177,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
               + nextWed.day.toString().padLeft(2, '0');
 
           //Check to see if next Wednesday already has a setlist
-          DocumentSnapshot snap = await setlistReference.document(nextWedStamp).get();
+          DocumentSnapshot snap = await setlistReference.doc(nextWedStamp).get();
           if(snap.data != null){
             //If one exists, prompt for overwrite
             SimpleDialog promptForOverwrite = SimpleDialog(
@@ -365,7 +365,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
       songNames.add(setlist[i].title);
     }
     Map<String, String> data = Map.fromIterables(songNums, songNames);
-    await setlistReference.document(docID).setData(data);
+    await setlistReference.doc(docID).set(data);
     //Nav back to landing page
     navToLandingPage(context);
   }

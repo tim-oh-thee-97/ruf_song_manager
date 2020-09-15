@@ -39,7 +39,7 @@ class _LandingPageState extends State<LandingPage>{
   final double _pad = 12;
 
   @override
-  void initState(){
+  void initState () {
     super.initState();
     _getMode().then((result){
       setState((){
@@ -71,10 +71,10 @@ class _LandingPageState extends State<LandingPage>{
   }
 
   @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
+  Widget build (BuildContext context) {
+    return Scaffold (
+      appBar: AppBar (
+        leading: IconButton (
           icon: Icon(Icons.help),
           iconSize: 32,
           //TODO: Implement open help
