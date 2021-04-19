@@ -27,9 +27,9 @@ enum SongType { begin, mid, end }
 class _GenerateSetlistState extends State<GenerateSetlist>{
   final mainReference = FirebaseFirestore.instance.collection('song-list');
   final setlistReference = FirebaseFirestore.instance.collection('past-setlists');
-  List<Song> songList = List<Song>();
-  List<Song> setlist = List<Song>();
-  List<Song> invalidSongs = List<Song>();
+  List<Song> songList = <Song>[];
+  List<Song> setlist = <Song>[];
+  List<Song> invalidSongs = <Song>[];
   bool _songListPopulated = false;
 
   final String _setlistLengthKey = 'setlist_length';
@@ -194,7 +194,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
 
                 Row(
                   children: <Widget>[
-                    FlatButton(
+                    TextButton (
                       child: Text("No", textScaleFactor: 1.25,
                         style: TextStyle(
                         color: Colors.blue[600],
@@ -204,7 +204,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
 
                     Spacer(),
 
-                    FlatButton(
+                    TextButton (
                       child: Text("Yes", textScaleFactor: 1.25,
                           style: TextStyle(
                             color: Colors.blue[600],
@@ -268,7 +268,7 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
   }
 
   List<Song> _buildSetlist(List<Song> allSongs) {
-    List<Song> setlist = List<Song>();
+    List<Song> setlist = <Song>[];
     //Create random generator
     Random gen = Random.secure();
 
@@ -358,8 +358,8 @@ class _GenerateSetlistState extends State<GenerateSetlist>{
     //Show circular progress indicator
     setState((){_songListPopulated = false;});
     //Push a setlist as a new document in the database
-    List<String> songNums = new List<String>();
-    List<String> songNames = new List<String>();
+    List<String> songNums = <String>[];
+    List<String> songNames = <String>[];
     for(int i = 0; i < setlist.length; i++){
       songNums.add("song" + (i+1).toString());
       songNames.add(setlist[i].title);

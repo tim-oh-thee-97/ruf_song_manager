@@ -130,7 +130,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
           title: Text("Verify your account"),
           content: Text("Link to verify account has been sent to your email"),
           actions: <Widget>[
-            FlatButton(
+            TextButton (
               child: Text("Dismiss"),
               onPressed: () {
                 _changeFormToLogin();
@@ -243,7 +243,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   }
 
   Widget _showSecondaryButton() {
-    return new FlatButton(
+    return new TextButton (
       child: _formMode == FormMode.LOGIN
           ? new Text('Create an account',
           style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.w300))
@@ -263,10 +263,12 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         padding: EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
         child: SizedBox(
           height: 40.0,
-          child: new RaisedButton(
-            elevation: 5.0,
-            shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-            color: Colors.blue,
+          child: new ElevatedButton (
+            style: ButtonStyle (
+              elevation: MaterialStateProperty.all(5.0),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))),
+              backgroundColor: MaterialStateProperty.all(Colors.blue)
+            ),
             child: _formMode == FormMode.LOGIN
                 ? new Text('Login',
                 style: new TextStyle(fontSize: 20.0, color: Colors.white))

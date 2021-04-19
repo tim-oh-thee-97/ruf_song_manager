@@ -247,7 +247,7 @@ class _SongListState extends State<SongList>{
   }
 
   void _displaySnackBar(BuildContext context, Widget toShow){
-    Scaffold.of(context)
+    ScaffoldMessenger.of(context)
       ..removeCurrentSnackBar()
       ..showSnackBar(SnackBar(content: toShow,
         duration: Duration(seconds: 2),));

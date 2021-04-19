@@ -173,7 +173,7 @@ class _ViewSetlistsState extends State<ViewSetlists>{
   }
 
   List<Widget> _populateOneSetlist(DocumentSnapshot ds){
-    List<Widget> songs = List<Widget>();
+    List<Widget> songs = <Widget>[];
     for(int i = 1; i <= ds.data().length; i++){
       String lookup = 'song' + i.toString();
       songs.add(
@@ -186,9 +186,9 @@ class _ViewSetlistsState extends State<ViewSetlists>{
                 Song chosen = await navToPageWithResult(context, SongList(admin: widget.admin, select: true,)) as Song;
                 if(chosen != null){
                   String songToChange = "song" + i.toString();
-                  List<String> songNum = new List<String>();
+                  List<String> songNum = <String>[];
                   songNum.add(songToChange);
-                  List<String> newSong = new List<String>();
+                  List<String> newSong = <String>[];
                   newSong.add(chosen.title);
                   mainReference.doc(ds.id)
                       .update(Map.fromIterables(songNum, newSong));

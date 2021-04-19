@@ -130,24 +130,30 @@ class _LandingPageState extends State<LandingPage>{
 
                 SizedBox(height: 2.05*_pad,),
 
-                RaisedButton(
-                  padding: EdgeInsets.all(_pad),
+                ElevatedButton (
+                  style: ButtonStyle (
+                    padding: MaterialStateProperty.all(EdgeInsets.all(_pad))
+                  ),
                   child: buttonText("View Song List"),
                   onPressed: () => navToPage(context, SongList(admin: _appAdminMode, select: false,)),
                 ),
 
                 SizedBox(height: 2*_pad,),
 
-                RaisedButton(
-                  padding: EdgeInsets.all(_pad),
+                ElevatedButton (
+                  style: ButtonStyle (
+                    padding: MaterialStateProperty.all(EdgeInsets.all(_pad))
+                  ),
                   child: buttonText("View Past Setlists"),
                   onPressed: () => navToPage(context, ViewSetlists(admin: _appAdminMode,)),
                 ),
 
                 SizedBox(height: 2*_pad,),
 
-                RaisedButton(
-                  padding: EdgeInsets.all(_pad),
+                ElevatedButton (
+                  style: ButtonStyle (
+                      padding: MaterialStateProperty.all(EdgeInsets.all(_pad))
+                  ),
                   //TODO: Add Spotify logo next to text?
                   child: buttonText("Open Spotify Playlist"),
                   onPressed: () => _launchSpotifyURL(context),
@@ -183,7 +189,7 @@ class _LandingPageState extends State<LandingPage>{
       await launch(url);
     }
     else {
-      Scaffold.of(ctxt)
+      ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text("Could not launch url. Please check settings."),
           duration: Duration(seconds: 5),));

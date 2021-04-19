@@ -76,8 +76,10 @@ class _SettingsState extends State<Settings>{
     final settingsWidgets = <Widget>[
       Container(
         height: 50,
-        child: RaisedButton(
-          color: Colors.blue[100],
+        child: ElevatedButton (
+          style: ButtonStyle (
+            backgroundColor: MaterialStateProperty.all(Colors.blue[100]),
+          ),
           child: Text("Reset to Defaults", textScaleFactor: 1.25,),
           onPressed: (){
             setState((){
@@ -135,12 +137,12 @@ class _SettingsState extends State<Settings>{
 
               Row(
                 children: <Widget>[
-                  FlatButton(
+                  TextButton (
                     child: Text("Cancel"),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Spacer(),
-                  FlatButton(
+                  TextButton (
                     child: Text("OK"),
                     onPressed: (){
                       setState((){_spotifyURL = _spotifyURLInput.text;});
@@ -168,7 +170,7 @@ class _SettingsState extends State<Settings>{
           ),
 
           Expanded(
-            child: FlatButton(
+            child: TextButton (
               child: Text("Middle songs in the same key\n(Coming Soon!)"),
               onPressed: null,//(){setState((){_midsSameKey = !_midsSameKey;});},
             ),
@@ -180,9 +182,11 @@ class _SettingsState extends State<Settings>{
 
       Container(
         height: 45,
-        child: RaisedButton(
-          padding: EdgeInsets.all(_pad),
-          color: Colors.red,
+        child: ElevatedButton (
+          style: ButtonStyle (
+            padding: MaterialStateProperty.all(EdgeInsets.all(_pad)),
+            backgroundColor: MaterialStateProperty.all(Colors.red)
+          ),
           child: Text("Logout"),
           onPressed: () => turnOffAdmin(context),
         ),
@@ -262,14 +266,14 @@ class _SettingsState extends State<Settings>{
 
         Row(
           children: <Widget>[
-            FlatButton(
+            TextButton (
               child: Text("No"),
               onPressed: (){Navigator.pop(context, true);},
             ),
 
             Spacer(),
 
-            FlatButton(
+            TextButton (
               child: Text("Yes"),
               onPressed: () {_saveSettings(); Navigator.pop(context, true);},
             ),
@@ -297,11 +301,12 @@ class _SettingsState extends State<Settings>{
     await showDialog<int>(
       context: context,
       builder: (context){
-        return NumberPickerDialog.integer(
+        return NumberPicker ( //TODO fix number picker dialog
+          onChanged: (int) {},
           minValue: 1,
           maxValue: 8,
           step: 1,
-          initialIntegerValue: _setlistLength,
+          value: _setlistLength,
         );
       },
     ).then((num value){
@@ -315,11 +320,12 @@ class _SettingsState extends State<Settings>{
     await showDialog<int>(
       context: context,
       builder: (context){
-        return NumberPickerDialog.integer(
+        return NumberPicker ( //TODO fix number picker dialog
+          onChanged: (int) {},
           minValue: 1,
           maxValue: 8,
           step: 1,
-          initialIntegerValue: _wksBeforeReuse,
+          value: _wksBeforeReuse,
         );
       },
     ).then((num value){

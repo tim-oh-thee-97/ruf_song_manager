@@ -1,6 +1,7 @@
 //Package imports
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 
 //File imports
 import 'song.dart';
@@ -126,7 +127,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
                 counterText: "",
               ),
               maxLength: 1,
-              maxLengthEnforced: true,
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
             ),
           ),
 
@@ -136,7 +137,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
 
           Spacer(),
 
-          FlatButton(
+          TextButton (
             child: Text(_maj ? "Major" : "Minor", textScaleFactor: 1.2,),
             onPressed: (){setState((){_maj = !_maj;});},
           ),
@@ -162,7 +163,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
               setState((){_begin = newVal;});
             },
           ),
-          FlatButton(
+          TextButton (
             child: Text("Begin", textScaleFactor: 1.25,),
             onPressed: (){setState((){_begin = !_begin;});},
           ),
@@ -179,7 +180,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
               });
             },
           ),
-          FlatButton(
+          TextButton (
             child: Text("Middle", textScaleFactor: 1.25,),
             onPressed: (){setState((){_mid = !_mid;});},
           ),
@@ -194,7 +195,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
               setState((){_end = newVal;});
             },
           ),
-          FlatButton(
+          TextButton (
             child: Text("End", textScaleFactor: 1.25,),
             onPressed: (){setState((){_end = !_end;});},
           ),
@@ -206,8 +207,10 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
       widget.song != null ?
       Container(
         height: 40,
-        child: RaisedButton(
-          color: Colors.redAccent,
+        child: ElevatedButton (
+          style: ButtonStyle (
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.redAccent),
+          ),
           child: Text("Delete Song"),
           onPressed: () async {
             SimpleDialog deleteConfirmation = SimpleDialog(
@@ -220,16 +223,16 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
                 Center(child: Text("Are you sure you want to delete this song?"),),
                 SizedBox(height: 4,),
 
-                Row(
+                Row (
                   children: <Widget>[
-                    FlatButton(
+                    TextButton (
                       child: Text("No"),
                       onPressed: (){Navigator.pop(context);},
                     ),
 
                     Spacer(),
 
-                    FlatButton(
+                    TextButton (
                       child: Text("Yes"),
                       onPressed: () {
                         mainReference.doc(widget.song.title).delete();
@@ -261,7 +264,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
                   value: 0,
                   onChanged: _radioChange,
                 ),
-                FlatButton(
+                TextButton (
                   onPressed: () => _radioChange(0),
                   child: Text("Save this song for this setlist only"),
                 ),
@@ -274,7 +277,7 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
                   value: 1,
                   onChanged: _radioChange,
                 ),
-                FlatButton(
+                TextButton (
                   onPressed: () => _radioChange(1),
                   child: Text("Save this song into the master song list"),
                 ),
@@ -285,8 +288,8 @@ class _AddEditSongPageState extends State<AddEditSongPage>{
       ) : Container(),
     ];
 
-    return Scaffold(
-      resizeToAvoidBottomPadding: false,
+    return Scaffold (
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(widget.song == null ? 'Add New Song' : 'Edit Song', textScaleFactor: 1.1,),
         actions: <Widget>[
